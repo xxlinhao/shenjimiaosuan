@@ -43,6 +43,7 @@ body{
   color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;font-family:inherit;
 }
 .tabs button.on{color:var(--brand);border-bottom-color:var(--brand)}
+.tabs button .dot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:5px;vertical-align:1.5px}
 
 .wrap{padding:12px 14px 0}
 .hidden{display:none !important}
@@ -64,10 +65,13 @@ body{
 /* ═══ 速览胶囊 ═══ */
 .quick{display:flex;gap:6px;margin-bottom:11px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px}
 .quick::-webkit-scrollbar{display:none}
-.qp{flex:0 0 auto;border-radius:10px;padding:7px 10px;border:1.5px solid;min-width:104px}
+.qp{flex:0 0 auto;border-radius:10px;padding:7px 10px;border:1.5px solid;min-width:104px;
+  cursor:pointer;font-family:inherit;text-align:left;display:block}
+.qp:active{filter:brightness(.95)}
 .qp .n{font-size:10px;font-weight:700;color:#4a515e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:104px}
 .qp .s{font-size:12.5px;font-weight:900;margin-top:2px;letter-spacing:-.2px}
 .qp .c{font-size:9.5px;font-weight:700;margin-top:1px;opacity:.75}
+.qp .go{font-size:9px;font-weight:800;color:var(--brand);margin-top:3px}
 
 /* ═══ KPI ═══ */
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
@@ -367,6 +371,7 @@ footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint)
     </div>
     <button class="btn-r" id="btnRefresh" onclick="loadAll(true)">刷新</button>
   </div>
+  <!-- 二级页标签：一只基金一页，点即进该基金详情。一级页在底部导航。 -->
   <div class="tabs" id="tabs"></div>
 </div>
 
@@ -1460,15 +1465,16 @@ var VIEWS=[
 ];
 var VIEW_ALIAS={ radar:'dash' };          // 兼容旧链接 ?view=radar
 
-/* 一级页只切换容器；二级页（基金详情）挂在仪表盘下，
-   由 fundPage 决定是否取代仪表盘内容，返回时回到仪表盘。 */
+/* 底部导航 = 一级页；顶部那排标签 = 二级页（基金选择器）。
+   一级页只负责切容器、并「回到本页根部」；二级页挂在仪表盘下，
+   由 fundPage 决定是否取代仪表盘内容。 */
 function switchView(k){
   if(VIEW_ALIAS[k]) k=VIEW_ALIAS[k];
   curView=k;
-  if(k!=='dash') fundPage=null;              // 切到别的页就退出二级页
-  applyView();
-  document.querySelectorAll('.tabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.k===k); });
-  document.querySelectorAll('.nav button').forEach(function(b){ b.classList.toggle('on', b.dataset.k===k); });
+  /* 一级页只负责「回到本页根部」。基金详情页是仪表盘下的二级页，
+     只能由顶部那排基金标签（或速览胶囊）打开，点一级页即退出二级页。 */
+  fundPage=null;
+  renderTabs(); renderNav(); applyView();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function applyView(){
@@ -1495,10 +1501,22 @@ function renderAll(){
   renderDash(); renderHold(); renderMkt(); renderSet(); renderFund();
   applyView();
 }
+/* 顶部标签 = 二级页：一只基金一个标签，点进去就是那只基金的整页详情。
+   只在「仪表盘」下出现（二级页从属于仪表盘），切到持仓/市场/设置即收起，
+   避免和底部一级导航重复。 */
 function renderTabs(){
+  var el=document.getElementById('tabs'); if(!el) return;
+  var list=funds.filter(function(f){ return f.on!==false; });
+  if(curView!=='dash'||!list.length){ el.classList.add('hidden'); el.innerHTML=''; return; }
+  el.classList.remove('hidden');
   var h='';
-  VIEWS.forEach(function(v){ h+='<button data-k="'+v.k+'" class="'+(v.k===curView?'on':'')+'" onclick="switchView(\''+v.k+'\')">'+v.lb+'</button>'; });
-  document.getElementById('tabs').innerHTML=h;
+  list.forEach(function(f){
+    var on=(fundPage===f.code), s=calcSignal(f);
+    h+='<button class="'+(on?'on':'')+'" title="'+esc(f.name)+'" onclick="openFund(\''+f.code+'\')">'
+      +esc(shortName(f.name))
+      +'<i class="dot" style="background:'+sigColor(s.level)+'"></i></button>';
+  });
+  el.innerHTML=h;
 }
 function renderNav(){
   var goN=funds.filter(function(f){ return f.on!==false; }).map(calcSignal).filter(function(s){ return s.level==='go'; }).length;
@@ -1506,7 +1524,7 @@ function renderNav(){
   VIEWS.forEach(function(v){
     h+='<button data-k="'+v.k+'" class="'+(v.k===curView?'on':'')+'" onclick="switchView(\''+v.k+'\')">'
       +'<span class="ic">'+v.ic+'</span><span class="lb">'+v.lb+'</span>'
-      +(v.k==='radar'&&goN?'<span class="badge">'+goN+'</span>':'')+'</button>';
+      +(v.k==='dash'&&goN?'<span class="badge">'+goN+'</span>':'')+'</button>';
   });
   document.getElementById('nav').innerHTML=h;
 }
@@ -1744,16 +1762,17 @@ function renderDash(){
       +'</div>';
   }
 
-  /* 速览胶囊：一眼看全部 */
+  /* 速览胶囊：一眼看全部，点任一格直接进该基金的二级页（不必下滑找卡片） */
   if(scored.length){
     h+='<div class="quick">';
     scored.slice().sort(function(a,b){ return b.s.score-a.s.score; }).forEach(function(x){
       var lv=x.s.level;
-      h+='<div class="qp" style="background:'+sigBg(lv)+';border-color:'
+      h+='<button class="qp" onclick="openFund(\''+x.f.code+'\')" style="background:'+sigBg(lv)+';border-color:'
         +(lv==='go'?'var(--go-bd)':(lv==='stop'?'var(--stop-bd)':(lv==='wait'?'var(--wait-bd)':'var(--none-bd)')))+'">'
         +'<div class="n">'+esc(shortName(x.f.name))+'</div>'
         +'<div class="s" style="color:'+sigColor(lv)+'">'+x.s.label+'</div>'
-        +'<div class="c" style="color:'+sigColor(lv)+'">评分 '+x.s.score+(x.s.detail.amount>0?' · '+money(x.s.detail.amount):' · 暂不投')+'</div></div>';
+        +'<div class="c" style="color:'+sigColor(lv)+'">评分 '+x.s.score+(x.s.detail.amount>0?' · '+money(x.s.detail.amount):' · 暂不投')+'</div>'
+        +'<div class="go">查看详情 ›</div></button>';
     });
     h+='</div>';
   }
@@ -1771,16 +1790,17 @@ function renderDash(){
     +'<div class="s">按信号倍数汇总</div></div>';
   h+='</div>';
 
-  /* 信号卡片 */
-  scored.sort(function(a,b){ return b.s.score-a.s.score; });
-  scored.forEach(function(x){ h+=sigCard(x.f,x.s,x.d); });
+  /* 每只基金的完整卡片已下沉到各自二级页（顶部标签直达 + 上方胶囊直达），
+     仪表盘只做总览，不再纵向堆三张「要下滑才点得到」的卡片。
+     注：sigCard() 函数保留未删，将来要做「全部基金长列表」时可直接复用。 */
 
   var lastD=null;
   list.forEach(function(f){ var d=dataMap[f.code]; if(d&&d.navDate&&(!lastD||d.navDate>lastD)) lastD=d.navDate; });
   h+='<div class="disc">净值日期：'+(lastD||'--')+'（基金净值每交易日公布一次，盘中无实时净值，故用对应场内 ETF 的今日行情做参考）。'
     +'评分由布林位置(35)、短期分位20日(20)、中期分位60日(20)、均线偏离(15)、长周期位置250日(10)五项加权得出，60 分及以上判定为可以加仓。'
     +'净值序列按「分红再投」复权，避免分红除息被误判为下跌。<br>'
-    +'点每张卡片下方的入口可进入该基金的二级页，看长线位置图、布林带、风险评估与基金经理。'
+    +'上方三个标签就是三只基金，点任一标签（或点上方速览胶囊）直接进入该基金页面，'
+    +'看长线位置图、布林带、风险评估与基金经理；点底部「仪表盘」回到本总览页。'
     +'本页仅供个人参考，不构成投资建议。</div>';
 
   document.getElementById('view-dash').innerHTML=h;
@@ -1865,8 +1885,8 @@ function renderFund(){
   var h='';
   /* 返回栏 */
   h+='<button class="back" onclick="closeFund()">'
-    +'<span class="bic">‹</span><span class="btx">返回仪表盘</span>'
-    +'<span class="bsub">'+esc(shortName(f.name))+'</span></button>';
+    +'<span class="bic">‹</span><span class="btx">返回仪表盘总览</span>'
+    +'<span class="bsub">当前：'+esc(shortName(f.name))+'</span></button>';
 
   /* 头卡 */
   h+='<div class="fhead"><div class="t">'+esc(f.name)+'</div>'
@@ -2472,10 +2492,11 @@ function renderSet(){
     +'<b>基金经理</b>：天天基金现任基金经理字段。首次读取只记基线，之后名字变化才提醒，旧名留档'
     +'</div>'
     +'<div class="disc">'
-    +'<b>页面结构</b>：一级页四个 —— 仪表盘（给结论与动作）、持仓、市场、设置。'
-    +'仪表盘上每只基金一张卡，点卡片进入该基金的二级页：今日建议总结 / 长线位置（年线 + 半年线）/ '
-    +'布林带 / 其他技术指标 / 风险评估 / 基金经理与规模。'
-    +'二级页可用 <code>?code=007466</code> 直接打开。</div></div>';
+    +'<b>页面结构</b>：底部导航是一级页四个 —— 仪表盘（总览：结论与动作）、持仓、市场、设置。'
+    +'仪表盘只在「目前该买哪只、买多少」上给结论，并有三个可点的基金速览格；'
+    +'<b>顶部那排标签是二级页</b>，一只基金一个标签，点一下直接切到那只基金的整页：'
+    +'今日建议总结 / 长线位置（年线 + 半年线）/ 布林带 / 其他技术指标 / 风险评估 / 基金经理与规模。'
+    +'点底部「仪表盘」即回到总览。二级页可用 <code>?code=007466</code> 直接打开。</div></div>';
 
   document.getElementById('view-set').innerHTML=h;
 }
