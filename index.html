@@ -120,6 +120,14 @@ body{
 .momo .m{flex:1;background:#fff;border:1px solid var(--bd2);border-radius:8px;padding:6px 3px;text-align:center}
 .momo .m .k{font-size:9.5px;color:var(--sub);font-weight:700;white-space:nowrap}
 .momo .m .v{font-size:13px;font-weight:900;margin-top:2px;letter-spacing:-.3px}
+/* 双均线图例与偏离度：年线（长期价值）与半年线（中期趋势）并排对照 */
+.mleg{display:flex;gap:10px;font-size:9px;color:var(--faint);margin-top:4px}
+.mleg .l1{color:#17a673}.mleg .l2{color:#e8952f}.mleg .l3{color:#2f80ed}
+.mdev{display:flex;gap:6px;margin-top:6px}
+.mdev>div{flex:1;background:#fff;border:1px solid var(--bd2);border-radius:8px;padding:5px 8px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:4px}
+.mdev .k{font-size:9.5px;color:var(--sub);font-weight:700;white-space:nowrap}
+.mdev b{font-size:12px;font-weight:900;letter-spacing:-.2px}
 .matier{margin-top:9px;padding-top:7px;border-top:1px dashed var(--bd);font-size:10.5px;color:#4a515e;line-height:1.55}
 .matier .ev{display:inline-block;margin-left:4px;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;background:var(--go-bg);color:#0a6b43}
 .matier .ev.off{background:var(--none-bg);color:#6b7480}
@@ -273,6 +281,80 @@ body{
   font-size:9px;font-weight:800;border-radius:8px;padding:1px 5px;min-width:15px;text-align:center}
 footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint);line-height:1.7}
 .disc{font-size:10px;color:var(--faint);line-height:1.65;background:var(--bg);border-radius:9px;padding:9px 11px;margin-top:9px}
+
+/* ═══ 卡片入口（仪表盘 → 基金详情） ═══ */
+.fbtn{display:flex;align-items:center;gap:8px;width:100%;margin-top:10px;padding:9px 11px;border:1px solid var(--bd);
+  background:#fff;border-radius:10px;font-size:12px;font-weight:800;color:var(--brand);cursor:pointer;font-family:inherit}
+.fbtn:active{background:var(--bg)}
+.fbtn .ar{margin-left:auto;color:var(--faint);font-weight:800}
+
+/* ═══ 二级页：返回栏 ═══ */
+.back{display:flex;align-items:center;gap:7px;width:100%;padding:10px 12px;background:#fff;border:1px solid var(--bd);
+  border-radius:12px;margin-bottom:10px;cursor:pointer;font-family:inherit;text-align:left}
+.back:active{background:var(--bg)}
+.back .bic{font-size:15px;color:var(--brand);font-weight:800;line-height:1}
+.back .btx{font-size:12.5px;font-weight:800;color:var(--tx)}
+.back .bsub{margin-left:auto;font-size:10px;color:var(--faint);text-align:right;line-height:1.3}
+
+/* ═══ 二级页：基金头卡 ═══ */
+.fhead{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:13px 14px;margin-bottom:4px}
+.fhead .t{font-size:15px;font-weight:900;letter-spacing:-.3px;line-height:1.3}
+.fhead .c{font-size:10.5px;color:var(--faint);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fhead .c .pill{background:var(--bg);border-radius:4px;padding:1px 5px;font-weight:700;color:var(--sub)}
+.fhead .navrow{display:flex;align-items:baseline;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--bd2)}
+.fhead .navrow .big{font-size:25px;font-weight:900;letter-spacing:-.8px;line-height:1.05}
+.fhead .navrow .ch{font-size:13.5px;font-weight:800}
+.fhead .navrow .dt{margin-left:auto;font-size:10px;color:var(--faint);text-align:right;line-height:1.35}
+
+/* ═══ 章节标题 ═══ */
+.sect{font-size:12px;font-weight:800;color:var(--tx);margin:15px 2px 7px;display:flex;align-items:center;gap:6px}
+.sect .tag{font-size:9.5px;font-weight:700;color:var(--sub);background:var(--bg);border-radius:4px;padding:1px 6px}
+.sect .hint{margin-left:auto;font-size:9.5px;color:var(--faint);font-weight:600}
+
+/* ═══ 风险评估（一行一指标：左侧含义、右侧数值） ═══ */
+.rv{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);
+  border-radius:12px;padding:10px 12px;margin-bottom:7px}
+.rv .l{flex:1;min-width:0}
+.rv .l .n{font-size:12px;font-weight:800;letter-spacing:-.1px}
+.rv .l .q{font-size:9.5px;color:var(--faint);margin-top:1px;line-height:1.4}
+.rv .l .bar{height:5px;border-radius:3px;background:var(--bg);margin-top:6px;overflow:hidden}
+.rv .l .bar b{display:block;height:100%;border-radius:3px}
+.rv .r{text-align:right;flex-shrink:0;min-width:76px}
+.rv .r .v{font-size:19px;font-weight:900;letter-spacing:-.5px;line-height:1.1}
+.rv .r .u{font-size:9.5px;font-weight:700;color:var(--faint);margin-left:1px}
+.rv .r .lb{font-size:9.5px;font-weight:800;margin-top:2px}
+
+/* ═══ 基金经理 ═══ */
+.mgr-hd{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.mgr-av{width:38px;height:38px;border-radius:10px;background:#eaf2fe;display:flex;align-items:center;
+  justify-content:center;font-size:17px;font-weight:900;color:var(--brand);flex-shrink:0}
+.mgr-nm{flex:1;min-width:0}
+.mgr-nm .n{font-size:14px;font-weight:800;letter-spacing:-.2px}
+.mgr-nm .s{font-size:10px;color:var(--faint);margin-top:2px;line-height:1.45}
+.mgr-sc{font-size:19px;font-weight:900;color:var(--brand);flex-shrink:0;letter-spacing:-.5px;text-align:right}
+.mgr-sc .u{display:block;font-size:9px;font-weight:700;color:var(--faint);letter-spacing:0}
+
+/* ═══ 键值网格（技术指标 / 规模持仓） ═══ */
+.kvs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd2);border-radius:9px;overflow:hidden}
+.kvs .kv{background:#fff;padding:8px 10px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.kvs .kv .k{font-size:10.5px;color:var(--sub);white-space:nowrap}
+.kvs .kv .v{font-size:12px;font-weight:700;text-align:right;white-space:nowrap}
+.kvrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:11.5px;line-height:1.9}
+.kvrow .k{color:var(--sub)}
+.kvrow .v{font-weight:800}
+.line{display:flex;align-items:stretch;gap:1px;background:var(--bd2);border-radius:9px;overflow:hidden;margin-top:9px}
+.line i{flex:1;text-align:center;padding:7px 2px;background:#fff;font-size:9.5px;color:var(--faint);line-height:1.35}
+.line i b{display:block;font-size:11px;font-weight:800}
+/* 二级页：风险指标下方的一句口径说明 */
+.rnote{font-size:9.5px;color:var(--faint);line-height:1.55;margin:-3px 2px 9px;padding-left:2px}
+/* 二级页：面板内的小节标题 */
+.sub2{font-size:11px;font-weight:800;color:var(--sub);margin:12px 0 5px}
+.pn .sub2:first-child{margin-top:0}
+/* 仪表盘卡片：年线 / 半年线速览 */
+.dline{display:flex;gap:6px;margin:2px 0 9px}
+.dline span{flex:1;background:var(--bg);border-radius:8px;padding:5px 9px;font-size:10.5px;color:var(--sub);
+  display:flex;justify-content:space-between;align-items:baseline;font-weight:700;gap:4px}
+.dline b{font-size:12.5px;font-weight:900;letter-spacing:-.2px}
 </style>
 </head>
 <body>
@@ -289,7 +371,8 @@ footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint)
 </div>
 
 <div class="wrap">
-  <div id="view-radar"></div>
+  <div id="view-dash"></div>
+  <div id="view-fund" class="hidden"></div>
   <div id="view-hold" class="hidden"></div>
   <div id="view-mkt" class="hidden"></div>
   <div id="view-set" class="hidden"></div>
@@ -319,6 +402,11 @@ footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint)
    以站名「神鸡妙算」命名（sjm = shen ji miao suan）。
    旧键按「新 → 旧」顺序兜底读取：换站名不会丢已保存的基金与参数。 */
 var LS_FUNDS = 'sjm_funds', LS_CFG = 'sjm_cfg', LS_CACHE = 'sjm_cache', LS_INDEX = 'sjm_index';
+var LS_MGR = 'sjm_mgr';            // 基金经理基线：用于检测「换人」，只在变更时提醒
+/* 缓存结构版本号：字段增删或解析口径修正后 +1，
+   旧版本缓存会被直接丢弃、改走联网取数，避免拿旧结构渲染出一片空洞。
+   v3：新增 mgr/evalInfo/scale/alloc/histAll/datesAll；修正 jzrq 取自 profit。 */
+var CACHE_V = 3;
 var OLD_KEYS = {
   funds: ['xjkp_funds', 'fm_funds'],
   cfg  : ['xjkp_cfg',   'fm_cfg'  ],
@@ -382,8 +470,11 @@ var MARKETS = [
 ];
 
 /* ═══ 状态 ═══ */
-var funds = [], cfg = {}, dataMap = {}, mktData = [], curView = 'radar';
+var funds = [], cfg = {}, dataMap = {}, mktData = [], curView = 'dash';
 var LOADING = false, USE_PROXY = false, CACHE_TS = 0;
+var fundPage = null;          // 二级页：当前查看的基金代码，null = 停留在仪表盘
+var BENCH_SYM = 'sh000300', BENCH_NAME = '沪深300';
+var BENCH_INFO = null;        // { sym, name, ret:{日期→日涨跌}, last, date, n }
 
 /* ═══════════════ 工具 ═══════════════ */
 function n(v,d){ var x=parseFloat(v); return isFinite(x)?x:(d===undefined?0:d); }
@@ -398,7 +489,11 @@ function pct(v,d){ d=d===undefined?2:d; if(v==null||!isFinite(v))return '--'; re
 function chgCls(v){ if(v==null||!isFinite(v)||Math.abs(v)<1e-9) return 'flat'; return v>0?'up':'dn'; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]}); }
 /** 时间戳 → 本地日期字符串。东财时间戳为 +08:00 零点，必须用本地时间取值，否则会差一天。 */
-function dstr(ms){ var d=new Date(ms); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function dstr(ms){
+  var d=new Date(ms);
+  if(!isFinite(d.getTime())) return '';   // 无效时间戳返回空串，避免页面出现 NaN-NaN-NaN
+  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+}
 function today(){ return dstr(Date.now()); }
 function nowHM(){ var d=new Date(); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
 
@@ -437,11 +532,13 @@ function maxDD(v,cnt){
 function retOf(v,cnt){ if(!v||v.length<=cnt) return null; var a=v[v.length-1-cnt], b=v[v.length-1]; return a>0 ? (b/a-1)*100 : null; }
 /** 按自然日窗口取收益（用于「近1年」等） */
 function retByDays(dates, vals, days){
-  var n=dates.length; if(n<2) return null;
-  var cut=dates[n-1]-days*86400000, idx=0, i;
-  for(i=0;i<n;i++){ if(dates[i]>=cut){ idx=i; break; } }
-  if(idx>=n-1) return null;
-  return (vals[n-1]/vals[idx]-1)*100;
+  /* 长度变量刻意叫 cnt：全局工具函数 n() 一旦被同名 var 遮蔽，
+     函数体内所有 n(...) 调用会在运行时抛「不是函数」。 */
+  var cnt=dates.length; if(cnt<2) return null;
+  var cut=dates[cnt-1]-days*86400000, idx=0, i;
+  for(i=0;i<cnt;i++){ if(dates[i]>=cut){ idx=i; break; } }
+  if(idx>=cnt-1) return null;
+  return (vals[cnt-1]/vals[idx]-1)*100;
 }
 function buildMetrics(v,dates){
   var last=v[v.length-1], o={ last:last, bars:v.length };
@@ -455,6 +552,90 @@ function buildMetrics(v,dates){
   return o;
 }
 
+/* ═══════════════ 风险指标（夏普 / 最大回撤 / 波动率 / Calmar / 信息比率） ═══════════════
+   窗口统一取近 RISK_WIN 个交易日，不足则用全部可用样本，页面上标出实际样本区间。
+   无风险利率默认 1.5%/年（货币基金与一年期定存的常态水平），可在设置页调整。
+   信息比率需要业绩基准：用沪深300 的日涨跌与基金日涨跌按「日期」逐日对齐后计算，
+   对不齐的日子跳过（场外基金公布日与交易所交易日偶有差异），并记录实际对齐天数 —— 
+   这个天数要显示出来，否则「只有 100 天对齐」的 IR 会被误当成可信结论。 */
+var RISK_WIN = 750, RF_DEF = 1.5;
+function meanOf(a){ var s=0,i; for(i=0;i<a.length;i++) s+=a[i]; return a.length?s/a.length:null; }
+function sdOf(a){ if(a.length<2) return null; var m=meanOf(a),s=0,i; for(i=0;i<a.length;i++) s+=(a[i]-m)*(a[i]-m); return Math.sqrt(s/(a.length-1)); }
+function dretOf(v){ var r=[],i; for(i=1;i<v.length;i++){ if(v[i-1]>0) r.push(v[i]/v[i-1]-1); } return r; }
+/** 最大回撤（负数百分比） */
+function mddOf(v){
+  if(!v||v.length<2) return null;
+  var pk=v[0], m=0, i;
+  for(i=1;i<v.length;i++){ if(v[i]>pk) pk=v[i]; var dd=v[i]/pk-1; if(dd<m) m=dd; }
+  return m*100;
+}
+/** 风险收益指标。bench 为 BENCH_INFO，可为 null（则不出口信息比率） */
+function riskOf(d, bench, rfRate){
+  var v=d&&d.histAll, dates=d&&d.datesAll;
+  if(!v||v.length<60) return null;
+  var from=Math.max(0,v.length-RISK_WIN);
+  var seg=v.slice(from), sd=(dates||[]).slice(from);
+  var r=dretOf(seg);
+  if(r.length<40) return null;
+  /* 样本数变量刻意不叫 n —— 全局工具函数 n() 会被同名的 var 遮蔽，
+     一旦遮蔽，下面 n(riskRate) 之类调用会直接抛错、整页中断。 */
+  var cnt=seg.length;
+  var vol=sdOf(r)*Math.sqrt(250)*100;                        // 年化波动率 %
+  var annArith=meanOf(r)*250*100;                            // 算术年化（夏普口径）
+  var annGeo=(Math.pow(seg[cnt-1]/seg[0],250/(cnt-1))-1)*100; // 几何年化（Calmar 口径）
+  var mdd=mddOf(seg);
+  var rf=n(rfRate,RF_DEF);
+  var sharpe = vol>0 ? (annArith-rf)/vol : null;
+  var calmar = (mdd!=null&&mdd<0) ? annGeo/Math.abs(mdd) : null;
+  var ir=null, exAnn=null, te=null, aligned=0;
+  if(bench&&(bench.ret||bench.retTs)){
+    var ex=[], i, dt, br;
+    for(i=1;i<cnt;i++){
+      dt=sd[i]; if(dt==null) continue;
+      br=null;
+      if(bench.retTs) br=bench.retTs[dt];                           // 时间戳表（首选，与 datesAll 同口径）
+      if(br==null&&bench.ret){
+        br=bench.ret[(typeof dt==='number')?dstr(dt):String(dt)];   // 日期字符串表兜底
+      }
+      if(br==null||!isFinite(br)) continue;
+      ex.push(r[i-1]-br); aligned++;
+    }
+    if(ex.length>=40){
+      exAnn=meanOf(ex)*250*100;
+      te=sdOf(ex)*Math.sqrt(250)*100;
+      if(te>0) ir=exAnn/te;
+    }
+  }
+  return { win:cnt, vol:vol, annArith:annArith, annGeo:annGeo, mdd:mdd, sharpe:sharpe,
+           calmar:calmar, ir:ir, exAnn:exAnn, te:te, aligned:aligned, rf:rf,
+           fromDate:sd[0]||'', toDate:sd[cnt-1]||'' };
+}
+/** 由 K 线构造业绩基准。
+    这里必须同时留两张索引表，缺一不可：
+      · ret   —— 日期字符串键（'2026-09-21'），K 线接口的原始格式
+      · retTs —— 本地零点毫秒时间戳键，与 histAll / datesAll 的口径一致
+    riskOf() 手里拿到的是 datesAll 的时间戳，如果只建字符串表，
+    每查一次都是 undefined、对齐天数恒为 0，信息比率会永远显示「--」。
+    这个坑真实踩过：三只基金的信息比率一度全部算不出来。 */
+function buildBench(rows){
+  if(!rows||rows.length<3) return null;
+  var ret={}, retTs={}, i, d, t, v;
+  for(i=1;i<rows.length;i++){
+    if(!(rows[i-1].c>0)) continue;
+    v=rows[i].c/rows[i-1].c-1;
+    d=rows[i].d;
+    ret[d]=v;
+    t=Date.parse(d+'T00:00:00');     // 补上时刻走本地时区，与 dstr() 口径保持一致
+    if(isFinite(t)) retTs[t]=v;
+  }
+  return { sym:BENCH_SYM, name:BENCH_NAME, ret:ret, retTs:retTs, n:rows.length,
+           last:rows[rows.length-1].c, date:rows[rows.length-1].d };
+}
+/** 加载业绩基准（沪深300 日线）。取 1200 根覆盖 750 交易日窗口，留足冗余。 */
+function loadBench(){
+  return kline(BENCH_SYM, 1200).then(function(rows){ BENCH_INFO=buildBench(rows); }).catch(function(){});
+}
+
 /* ═══════════════ 复权序列 ═══════════════
    东财的 equityReturn 字段本身就是「分红调整后的当日涨跌」（已在派现日验证：
    2026-09-03 派现 0.005 元，单位净值 1.649→1.646 跌 0.18%，而 equityReturn=+0.12%，
@@ -463,18 +644,19 @@ function buildMetrics(v,dates){
    ═══════════════════════════════════════════ */
 function divOf(t){ var m=String(t.unitMoney||'').match(/派现金?([\d.]+)元/); return m?parseFloat(m[1]):0; }
 function buildAdj(trend){
-  var n=trend.length, adj=new Array(n), i;
-  adj[n-1]=trend[n-1].y;
-  for(i=n-1;i>0;i--){
+  /* 同上：不要用 n 当长度变量名，避免遮蔽全局工具函数 n() */
+  var len=trend.length, adj=new Array(len), i;
+  adj[len-1]=trend[len-1].y;
+  for(i=len-1;i>0;i--){
     var r=parseFloat(trend[i].equityReturn);
     if(!isFinite(r)||r<=-100) r=0;          // 异常值保护
     adj[i-1]=adj[i]/(1+r/100);
   }
   // 兜底：若首段 equityReturn 不可用，则用分红累乘校正整体尺度
   if(!(adj[0]>0)){
-    var cum=new Array(n), F=1;
-    for(i=0;i<n;i++){ var d=divOf(trend[i]); if(d>0&&trend[i].y>0) F*=(1+d/trend[i].y); cum[i]=F; }
-    for(i=0;i<n;i++) adj[i]=trend[i].y*cum[i]/cum[n-1];
+    var cum=new Array(len), F=1;
+    for(i=0;i<len;i++){ var d=divOf(trend[i]); if(d>0&&trend[i].y>0) F*=(1+d/trend[i].y); cum[i]=F; }
+    for(i=0;i<len;i++) adj[i]=trend[i].y*cum[i]/cum[len-1];
   }
   return adj;
 }
@@ -512,21 +694,24 @@ function maTierOf(dev){
   }
   return null;
 }
-/** 年线序列（O(n) 滑动窗口，一次算好按 code 缓存，避免每次重绘重算） */
+/** 任意周期均线序列（O(n) 滑动窗口，按 code+窗口 缓存，避免每次重绘重算） */
 var _maCache={};
-function maOf(d){
+function maWin(d, win){
   if(!d||!d.histAll||!d.histAll.length) return null;
-  var c=_maCache[d.code];
+  var key=d.code+'_'+win, c=_maCache[key];
   if(c && c.n===d.histAll.length) return c.s;
-  var v=d.histAll, n=v.length, s=new Array(n), sum=0, cnt=0, i;
-  for(i=0;i<n;i++){
+  /* 同上：不要用 n 当长度变量名，避免遮蔽全局 n() */
+  var v=d.histAll, len=v.length, s=new Array(len), sum=0, cnt=0, i;
+  for(i=0;i<len;i++){
     sum+=v[i]; cnt++;
-    if(cnt>MA_WIN){ sum-=v[i-MA_WIN]; cnt=MA_WIN; }
-    s[i]= cnt===MA_WIN ? sum/MA_WIN : null;
+    if(cnt>win){ sum-=v[i-win]; cnt=win; }
+    s[i]= cnt===win ? sum/win : null;
   }
-  _maCache[d.code]={ n:n, s:s };
+  _maCache[key]={ n:len, s:s };
   return s;
 }
+/** 年线序列（250 日） */
+function maOf(d){ return maWin(d, MA_WIN); }
 /** 汇总某只基金的年线状态：偏离值 / 档位 / 样本是否够 / 是否参与决策 */
 function maState(f,d){
   var mv=d&&d.metrics?d.metrics.ma:null;
@@ -783,9 +968,54 @@ function jget(url, ms){
  *  注意：pingzhongdata 用全局变量承载数据，多只基金必须**串行**加载，否则全局变量互相覆盖。
  *  代码不存在时上游返回 404 页面（HTTP 200 的 HTML），故 load 事件会成功触发，
  *  必须靠「全局变量是否被赋值」来判断，并标记 codeNotFound 以便与网络故障区分。*/
+/* ── pingzhongdata 附加信息解析 ──
+   这几个变量（基金经理 / 业绩评价 / 规模 / 资产配置）同样通过全局变量注入，
+   必须在加载后立刻读出并转成精简结构，否则会被下一只基金的加载覆盖掉。 */
+function parseMgr(raw){
+  if(!raw||!raw.length) return null;
+  var out=[], i;
+  for(i=0;i<raw.length;i++){
+    var m=raw[i]; if(!m||!m.name) continue;
+    var p=m.profit||{}, cats=p.categories||[], ser=(p.series&&p.series[0]&&p.series[0].data)||[];
+    var pf={};
+    for(var k=0;k<cats.length;k++){ if(ser[k]&&isFinite(ser[k].y)) pf[cats[k]]=ser[k].y; }
+    var sc=parseFloat(m.power&&m.power.avr);
+    out.push({ id:String(m.id||''), name:m.name, star:n(m.star),
+      workTime:m.workTime||'', fundSize:m.fundSize||'',
+      /* jzrq（数据截止日）不在经理对象顶层，实测位于 m.profit.jzrq；
+         这里同时兜底顶层，万一天天基金调整结构也不会立刻丢值。 */
+      score:isFinite(sc)?sc:null, profit:pf, jzrq:(p.jzrq||m.jzrq||'') });
+  }
+  return out.length?out:null;
+}
+function parseEval(raw){
+  if(!raw||!raw.categories||!raw.data) return null;
+  var avr=parseFloat(raw.avr);
+  return { avr:isFinite(avr)?avr:null, categories:raw.categories.slice(),
+           data:(raw.data||[]).map(function(x){ var y=parseFloat(x); return isFinite(y)?y:null; }) };
+}
+function parseScale(raw){
+  if(!raw||!raw.categories||!raw.series) return null;
+  var s=raw.series||[];
+  return { cats:raw.categories.slice(),
+           vals:s.map(function(x){ var y=parseFloat(x&&x.y); return isFinite(y)?y:null; }),
+           mom:s.map(function(x){ return (x&&x.mom)||''; }) };
+}
+function parseAlloc(raw){
+  if(!raw||!raw.series||!raw.categories) return null;
+  var o={ cats:raw.categories.slice(), items:[] };
+  raw.series.forEach(function(s){
+    var last=(s.data||[]).slice(-1)[0], y=parseFloat(last);
+    o.items.push({ name:s.name, last:isFinite(y)?y:null });
+  });
+  return o;
+}
+
 function loadFundStatic(code){
   return new Promise(function(resolve, reject){
     window.fS_name=undefined; window.Data_netWorthTrend=undefined;
+    window.Data_currentFundManager=undefined; window.Data_performanceEvaluation=undefined;
+    window.Data_fluctuationScale=undefined; window.Data_assetAllocation=undefined;
     loadScriptTag('https://fund.eastmoney.com/pingzhongdata/'+code+'.js?v='+Date.now(), 16000)
       .then(function(){
         var nm=window.fS_name, tr=window.Data_netWorthTrend;
@@ -794,7 +1024,11 @@ function loadFundStatic(code){
           e.codeNotFound=true;      // 代码本身有问题，不必切代理
           reject(e); return;
         }
-        resolve({ name:nm, trend:tr });
+        resolve({ name:nm, trend:tr,
+          mgr:parseMgr(window.Data_currentFundManager),
+          evalInfo:parseEval(window.Data_performanceEvaluation),
+          scale:parseScale(window.Data_fluctuationScale),
+          alloc:parseAlloc(window.Data_assetAllocation) });
       })
       .catch(reject);
   });
@@ -825,8 +1059,21 @@ function normalizeFund(code, raw, f){
     bars:m, firstDate:dstr(trend[0].x),
     divCount:trend.filter(function(t){ return t.unitMoney; }).length,
     metrics:buildMetrics(vals,dates),
-    hist:hist, histAll:vals, datesAll:dates, proxy:!!raw.proxy
+    hist:hist, histAll:vals, datesAll:dates, proxy:!!raw.proxy,
+    // 附加信息：代理模式（/api/nav）不返回，故可能为 null
+    mgr:raw.mgr||null, evalInfo:raw.evalInfo||null,
+    scale:raw.scale||null, alloc:raw.alloc||null
   };
+}
+/** 风险指标（带缓存：同一份序列 + 同一个基准只算一次） */
+var _riskCache={};
+function riskOfFund(d){
+  if(!d||!d.histAll||!d.histAll.length) return null;
+  var key=d.code+'|'+d.histAll.length+'|'+(BENCH_INFO?BENCH_INFO.n:0)+'|'+n(cfg.rf,RF_DEF);
+  if(_riskCache[key]!==undefined) return _riskCache[key];
+  var r=riskOf(d, BENCH_INFO, cfg.rf);
+  _riskCache[key]=r;
+  return r;
 }
 
 /** 取单只基金：静态直连优先，失败自动切同源代理（/api/nav）
@@ -1069,8 +1316,10 @@ function loadLocal(){
   cfg=lsLoad('cfg', LS_CFG, function(o){ return o && o.holdCap!==undefined; })||{};
   if(cfg.holdCap===undefined) cfg.holdCap=40;
   if(cfg.totalCap===undefined) cfg.totalCap=75;
+  if(cfg.rf===undefined) cfg.rf=RF_DEF;          // 无风险利率（%），用于夏普比率
+  loadMgrBase();
   try{
-    var c=lsLoad('cache', LS_CACHE, function(o){ return o && (o.funds||o.mkt); });
+    var c=lsLoad('cache', LS_CACHE, function(o){ return o && o.v===CACHE_V && (o.funds||o.mkt); });
     if(c&&c.funds){ c.funds.forEach(function(x){ if(x&&x.code&&x.metrics) dataMap[x.code]=x; }); CACHE_TS=c.t||0; }
     if(c&&c.mkt) mktData=c.mkt;
   }catch(e){}
@@ -1081,11 +1330,16 @@ function saveCache(){
   try{
     var arr=[]; Object.keys(dataMap).forEach(function(k){
       var d=dataMap[k]; if(!d||!d.metrics) return;
+      /* histAll / datesAll（完整复权序列）一并缓存：
+         二级页的长线位置图与风险指标都依赖完整序列，不存的话弱网下从缓存打开
+         会看到「样本不足」，白等一轮。序列约 1700 个浮点数/只，体积可接受。 */
       arr.push({ code:d.code,name:d.name,ok:d.ok,errors:d.errors,nav:d.nav,navDate:d.navDate,navChg:d.navChg,
                  bars:d.bars,firstDate:d.firstDate,divCount:d.divCount,metrics:d.metrics,hist:d.hist,
-                 live:d.live,proxy:d.proxy,officialName:d.officialName });
+                 histAll:d.histAll,datesAll:d.datesAll,
+                 live:d.live,proxy:d.proxy,officialName:d.officialName,
+                 mgr:d.mgr,evalInfo:d.evalInfo,scale:d.scale,alloc:d.alloc });
     });
-    localStorage.setItem(LS_CACHE, JSON.stringify({ t:Date.now(), funds:arr, mkt:mktData }));
+    localStorage.setItem(LS_CACHE, JSON.stringify({ v:CACHE_V, t:Date.now(), funds:arr, mkt:mktData }));
   }catch(e){}
 }
 
@@ -1120,9 +1374,12 @@ function loadAll(manual){
     document.getElementById('stamp').textContent='取数完成 '+done+'/'+total+'，读取场内行情…';
     return loadLive(list);
   }).then(function(){
+    return loadBench();               // 业绩基准（沪深300），供信息比率使用
+  }).then(function(){
     return marketAll().then(function(mk){ mktData=mk; }).catch(function(){});
   }).then(function(){
     saveCache();
+    checkMgrChange();                 // 基金经理若与上次记录不同，弹出提醒
     var okN=results.filter(function(r){ return r.ok; }).length;
     document.getElementById('stamp').textContent='已更新 '+nowHM()+' · '+okN+'/'+total+' 只成功';
     if(manual===true && okN===0) alert('取数失败，请检查网络后重试');
@@ -1150,15 +1407,65 @@ function loadLive(list){
   return Promise.all(tasks);
 }
 
+/* ═══════════════ 基金经理变更提醒 ═══════════════
+   第一次看到某只基金只记基线、不报警；之后每次取数都比对，名字或 ID 变了才提示。
+   换帅对「按信号补仓」是实质性变量：指数增强型换人会改跟踪误差，
+   主动型换人会改风格，历史统计的有效性随之打折。所以不仅提醒，还把旧名留档。 */
+var MGR_BASE = {}, MGR_ALERT = {};
+function mgrNow(d){
+  if(!d||!d.mgr||!d.mgr.length) return null;
+  var names=d.mgr.map(function(m){ return m.name; }).filter(Boolean);
+  if(!names.length) return null;
+  return { name:names.join('、'),
+           ids:d.mgr.map(function(m){ return m.id; }).filter(Boolean).join(',') };
+}
+/** 取该基金的经理信息（含历史变更留档） */
+function mgrInfo(f, d){
+  var cur=mgrNow(d);
+  if(!cur) return null;
+  var b=MGR_BASE[f.code]||{};
+  return { now:cur.name, ids:cur.ids, list:d.mgr,
+           changed:!!(b.prevOld && b.prevOld!==cur.name),
+           prevOld:b.prevOld||'', prevOldAt:b.prevOldAt||'', since:b.at||'' };
+}
+function checkMgrChange(){
+  var hits={}, upd=false;
+  funds.forEach(function(f){
+    var cur=mgrNow(dataMap[f.code]); if(!cur) return;
+    var b=MGR_BASE[f.code];
+    if(!b){ MGR_BASE[f.code]={ name:cur.name, ids:cur.ids, at:today() }; upd=true; return; }
+    if(b.name!==cur.name || String(b.ids||'')!==cur.ids){
+      hits[f.code]={ old:b.name, now:cur.name };
+      MGR_BASE[f.code]={ name:cur.name, ids:cur.ids, at:today(),
+                         prevOld:b.name, prevOldAt:b.at||today(),
+                         prevOldIds:b.ids||'' };
+      upd=true;
+    }
+  });
+  if(upd) saveMgrBase();
+  MGR_ALERT=hits;
+  return hits;
+}
+function saveMgrBase(){ try{ localStorage.setItem(LS_MGR, JSON.stringify(MGR_BASE)); }catch(e){} }
+function loadMgrBase(){
+  try{ MGR_BASE=JSON.parse(localStorage.getItem(LS_MGR)||'{}')||{}; }catch(e){ MGR_BASE={}; }
+}
+
 /* ═══════════════ 视图 ═══════════════ */
 var VIEWS=[
-  {k:'radar', ic:'🎯', lb:'加仓雷达'},
+  {k:'dash', ic:'🎯', lb:'仪表盘'},
   {k:'hold',  ic:'💼', lb:'持仓'},
   {k:'mkt',   ic:'🌐', lb:'市场'},
   {k:'set',   ic:'⚙️', lb:'设置'}
 ];
+var VIEW_ALIAS={ radar:'dash' };          // 兼容旧链接 ?view=radar
+
+/* 一级页只切换容器；二级页（基金详情）挂在仪表盘下，
+   由 fundPage 决定是否取代仪表盘内容，返回时回到仪表盘。 */
 function switchView(k){
+  if(VIEW_ALIAS[k]) k=VIEW_ALIAS[k];
   curView=k;
+  if(k!=='dash') fundPage=null;              // 切到别的页就退出二级页
   applyView();
   document.querySelectorAll('.tabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.k===k); });
   document.querySelectorAll('.nav button').forEach(function(b){ b.classList.toggle('on', b.dataset.k===k); });
@@ -1169,10 +1476,23 @@ function applyView(){
     var el=document.getElementById('view-'+v.k);
     if(el) el.classList.toggle('hidden', v.k!==curView);
   });
+  var fp=document.getElementById('view-fund'), dh=document.getElementById('view-dash');
+  var on = (curView==='dash') && !!fundPage;
+  if(fp) fp.classList.toggle('hidden', !on);
+  if(dh) dh.classList.toggle('hidden', curView!=='dash' || on);
+}
+function openFund(code){
+  if(!fundByCode(code)) return;
+  fundPage=code; curView='dash';
+  renderAll(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeFund(){
+  fundPage=null;
+  renderAll(); window.scrollTo({top:0,behavior:'smooth'});
 }
 function renderAll(){
   renderTabs(); renderNav();
-  renderRadar(); renderHold(); renderMkt(); renderSet();
+  renderDash(); renderHold(); renderMkt(); renderSet(); renderFund();
   applyView();
 }
 function renderTabs(){
@@ -1233,19 +1553,24 @@ function spark(d){
   return h;
 }
 
-/* ── 长线位置图：近 3 年复权净值 + 250 日年线 + 多周期动量 ──
+/* ── 长线位置图：近 3 年复权净值 + 250 日年线 + 120 日半年线 + 多周期动量 ──
    用复权净值而不是单位净值：年线若用未复权净值算，每次分红都会把线压下去，
    红利类基金一年派现十几次，年线会被系统性低估，历史分位也随之失真。
-   3 年窗口是刻意的：年线本身要 250 天才有意义，窗口太短看不出「线上/线下」的往复。 */
+   3 年窗口是刻意的：年线本身要 250 天才有意义，窗口太短看不出「线上/线下」的往复。
+   半年线（120 日）是年线的补充：年线定「值不值得长期花钱」，半年线反映中期趋势转向，
+   两条线一快一慢，比单看年线更早看到趋势掉头。 */
 function maChart(d,s){
   if(!d||!d.histAll||d.histAll.length<MA_WIN+30) return '';
   var ma=maOf(d); if(!ma) return '';
-  var v=d.histAll, n=v.length;
-  var VIEW=750, from=Math.max(0,n-VIEW), cn=n-from;
+  var m120=maWin(d,120);
+  /* 长度变量一律叫 len：用 n 会遮蔽全局工具函数 n()，埋运行时炸弹 */
+  var v=d.histAll, len=v.length;
+  var VIEW=750, from=Math.max(0,len-VIEW), cn=len-from;
   var W=300, H=92, pad=6, i;
   var mn=Infinity, mx=-Infinity;
-  for(i=from;i<n;i++){
+  for(i=from;i<len;i++){
     if(ma[i]!=null){ if(ma[i]<mn) mn=ma[i]; if(ma[i]>mx) mx=ma[i]; }
+    if(m120&&m120[i]!=null){ if(m120[i]<mn) mn=m120[i]; if(m120[i]>mx) mx=m120[i]; }
     if(v[i]<mn) mn=v[i]; if(v[i]>mx) mx=v[i];
   }
   if(!isFinite(mn)||!isFinite(mx)||mx<=mn) return '';
@@ -1255,27 +1580,38 @@ function maChart(d,s){
 
   var st=s&&s.detail?s.detail.ma:null;
   var dev=st?st.dev:null;
+  var dev120=(m120&&m120[len-1]>0)?(v[len-1]/m120[len-1]-1)*100:null;
 
   var h='<div class="mac">';
-  h+='<div class="mac-hd"><span>长线位置 · 价格 + 250 日年线</span>'
+  h+='<div class="mac-hd"><span>长线位置 · 价格 + 年线(250) + 半年线(120)</span>'
     +'<span class="mac-dev '+(dev==null?'':chgCls(dev))+'">偏离年线 '+(dev==null?'--':pct(dev))+'</span></div>';
 
   h+='<svg class="macsvg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">';
   var lp='';
-  for(i=from;i<n;i++) lp+=X(i).toFixed(1)+','+Y(v[i]).toFixed(1)+' ';
+  for(i=from;i<len;i++) lp+=X(i).toFixed(1)+','+Y(v[i]).toFixed(1)+' ';
   h+='<polygon points="'+pad+','+(H-pad)+' '+lp+(W-pad)+','+(H-pad)+'" fill="#e7f5ee"/>';
   h+='<polyline points="'+lp+'" fill="none" stroke="#17a673" stroke-width="1.6" '
     +'vector-effect="non-scaling-stroke" stroke-linejoin="round"/>';
   var mp='';
-  for(i=from;i<n;i++){ if(ma[i]!=null) mp+=X(i).toFixed(1)+','+Y(ma[i]).toFixed(1)+' '; }
+  for(i=from;i<len;i++){ if(ma[i]!=null) mp+=X(i).toFixed(1)+','+Y(ma[i]).toFixed(1)+' '; }
   if(mp) h+='<polyline points="'+mp+'" fill="none" stroke="#e8952f" stroke-width="1.7" '
     +'stroke-dasharray="5 3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>';
-  h+='<circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(v[n-1]).toFixed(1)+'" r="2.8" fill="#17a673"/>';
+  /* 半年线：细蓝点线，与年线区分开（年线橙色长虚线、半年线蓝色点线） */
+  var m120p='';
+  if(m120){ for(i=from;i<len;i++){ if(m120[i]!=null) m120p+=X(i).toFixed(1)+','+Y(m120[i]).toFixed(1)+' '; } }
+  if(m120p) h+='<polyline points="'+m120p+'" fill="none" stroke="#2f80ed" stroke-width="1.3" '
+    +'stroke-dasharray="1.5 3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>';
+  h+='<circle cx="'+X(len-1).toFixed(1)+'" cy="'+Y(v[len-1]).toFixed(1)+'" r="2.8" fill="#17a673"/>';
   h+='</svg>';
+
+  /* 图例：三条线颜色对照，免得「哪条是年线」要靠猜 */
+  h+='<div class="mleg"><span class="l1">—— 复权净值</span>'
+    +'<span class="l2">-- 年线(250)</span><span class="l3">·· 半年线(120)</span></div>';
 
   var dts=d.datesAll||[];
   h+='<div class="mac-ax"><span>'+(dts[from]?dstr(dts[from]):'')+'</span>'
-    +'<span class="mid">年线 '+(ma[n-1]!=null?fx(ma[n-1],4):'--')+'</span>'
+    +'<span class="mid">年线 '+(ma[len-1]!=null?fx(ma[len-1],4):'--')
+    +(m120&&m120[len-1]!=null?' ｜ 半年线 '+fx(m120[len-1],4):'')+'</span>'
     +'<span>'+(d.navDate||'')+'</span></div>';
 
   /* 多周期动量（与参考图一致：近 5 / 10 / 20 日） */
@@ -1286,6 +1622,11 @@ function maChart(d,s){
       +'<div class="v '+chgCls(x[1])+'">'+(x[1]==null?'--':pct(x[1]))+'</div></div>';
   });
   h+='</div>';
+  /* 两条均线的偏离度并排给出：年线定「长期值不值得花钱」，半年线看中期趋势有没有掉头 */
+  h+='<div class="mdev">'
+    +'<div><span class="k">偏离年线</span><b class="'+(dev==null?'':chgCls(dev))+'">'+(dev==null?'--':pct(dev))+'</b></div>'
+    +'<div><span class="k">偏离半年线</span><b class="'+(dev120==null?'':chgCls(dev120))+'">'+(dev120==null?'--':pct(dev120))+'</b></div>'
+    +'</div>';
 
   /* 年线补仓计划：直接回答「这一档该补多少钱」
      只有通过分段检验的品种（当前仅红利低波）才给金额；
@@ -1329,8 +1670,8 @@ function maChart(d,s){
   return h;
 }
 
-/* ── 雷达页 ── */
-function renderRadar(){
+/* ── 仪表盘（一级页）：给结论与动作，细节在每只基金的二级页 ── */
+function renderDash(){
   var list=funds.filter(function(f){ return f.on!==false; });
   var scored=list.map(function(f){ return { f:f, s:calcSignal(f), d:dataMap[f.code] }; });
   var go=scored.filter(function(x){ return x.s.level==='go'; });
@@ -1355,6 +1696,17 @@ function renderRadar(){
   var soft=scored.filter(function(x){ return x.s.level==='wait' && n(x.s.detail.amount)>0; });
 
   var h='';
+
+  /* 基金经理变更：不属于「买不买」的信号，但属于「这套信号还灵不灵」的前提，故单独置顶 */
+  var mgrHit=[];
+  list.forEach(function(f){
+    var mi=mgrInfo(f,dataMap[f.code]);
+    if(mi&&mi.changed) mgrHit.push(shortName(f.name)+'：'+mi.prevOld+' → '+mi.now);
+  });
+  if(mgrHit.length){
+    h+='<div class="warn"><b>⚠ 基金经理变更</b><br>'+mgrHit.map(esc).join('<br>')
+      +'<br>换帅会改变跟踪误差与持仓风格，历史统计的有效性要打折看待。</div>';
+  }
 
   /* 结论横幅 ·「见鸡行事」= 看到信号才动手，所以标题直接给动作，读作「黄金A 加 50 元」 */
   if(!list.length){
@@ -1427,12 +1779,318 @@ function renderRadar(){
   list.forEach(function(f){ var d=dataMap[f.code]; if(d&&d.navDate&&(!lastD||d.navDate>lastD)) lastD=d.navDate; });
   h+='<div class="disc">净值日期：'+(lastD||'--')+'（基金净值每交易日公布一次，盘中无实时净值，故用对应场内 ETF 的今日行情做参考）。'
     +'评分由布林位置(35)、短期分位20日(20)、中期分位60日(20)、均线偏离(15)、长周期位置250日(10)五项加权得出，60 分及以上判定为可以加仓。'
-    +'净值序列按「分红再投」复权，避免分红除息被误判为下跌。本页仅供个人参考，不构成投资建议。</div>';
+    +'净值序列按「分红再投」复权，避免分红除息被误判为下跌。<br>'
+    +'点每张卡片下方的入口可进入该基金的二级页，看长线位置图、布林带、风险评估与基金经理。'
+    +'本页仅供个人参考，不构成投资建议。</div>';
 
-  document.getElementById('view-radar').innerHTML=h;
+  document.getElementById('view-dash').innerHTML=h;
 }
 function shortName(nm){
   return String(nm||'').replace(/ETF联接|ETF|联接|基金/g,'').replace(/华泰柏瑞|易方达|华安|中证|华夏|南方|广发|富国|招商|天弘|博时|嘉实/g,'').trim() || String(nm||'').slice(0,6);
+}
+function stars(k){
+  var s='', i, c=Math.max(0,Math.min(5,Math.round(n(k))));
+  for(i=0;i<c;i++) s+='★';
+  return s;
+}
+
+/* ═══════════════ 二级页：单只基金的核心要素 ═══════════════
+   顺序刻意排成「先给动作 → 再给依据 → 最后给风险」：
+     ① 今日建议总结  ② 长线位置（年线 + 半年线）  ③ 布林带
+     ④ 其他技术指标  ⑤ 风险评估  ⑥ 基金经理与规模
+   三只基金目前共用同一套指标；将来哪只更适合看别的重点指标，单独在这页调整即可。 */
+var RV_TONE={ good:'#0f9d58', ok:'#2f80ed', mid:'#d99400', bad:'#e0393e', flat:'#aab2c0' };
+/** 风险指标评级：返回 { lb 文字档, tone 配色, pct 进度条宽度 } */
+function rvGrade(kind, v){
+  if(v==null||!isFinite(v)) return { lb:'--', tone:'flat', pct:0 };
+  if(kind==='sharpe'){
+    if(v>=1)   return { lb:'优', tone:'good', pct:Math.min(100, 55+v/2*45) };
+    if(v>=0.5) return { lb:'良', tone:'ok',   pct:40+ (v-0.5)/0.5*15 };
+    if(v>=0)   return { lb:'中', tone:'mid',  pct:20+ v/0.5*20 };
+    return { lb:'差', tone:'bad', pct:8 };
+  }
+  if(kind==='mdd'){
+    var a=Math.abs(v);
+    if(a<=10)  return { lb:'优', tone:'good', pct:20 };
+    if(a<=20)  return { lb:'良', tone:'ok',   pct:42 };
+    if(a<=30)  return { lb:'中', tone:'mid',  pct:68 };
+    return { lb:'差', tone:'bad', pct:95 };
+  }
+  if(kind==='vol'){
+    if(v<10)  return { lb:'低',  tone:'good', pct:22 };
+    if(v<20)  return { lb:'中',  tone:'ok',   pct:48 };
+    if(v<30)  return { lb:'偏高',tone:'mid',  pct:72 };
+    return { lb:'高', tone:'bad', pct:94 };
+  }
+  if(kind==='calmar'){
+    if(v>=1)   return { lb:'优', tone:'good', pct:Math.min(100, 55+v/2*45) };
+    if(v>=0.5) return { lb:'良', tone:'ok',   pct:40+ (v-0.5)/0.5*15 };
+    if(v>=0)   return { lb:'中', tone:'mid',  pct:20+ v/0.5*20 };
+    return { lb:'差', tone:'bad', pct:8 };
+  }
+  if(kind==='ir'){
+    if(v>=1)   return { lb:'优', tone:'good', pct:Math.min(100, 55+v/1.5*45) };
+    if(v>=0.5) return { lb:'良', tone:'ok',   pct:40+ (v-0.5)/0.5*15 };
+    if(v>=0)   return { lb:'中', tone:'mid',  pct:20+ v/0.5*20 };
+    return { lb:'跑输', tone:'bad', pct:10 };
+  }
+  return { lb:'--', tone:'flat', pct:0 };
+}
+function rvRow(name, q, val, unit, g, note){
+  var c=RV_TONE[g.tone]||RV_TONE.flat;
+  var h='<div class="rv"><div class="l">'
+    +'<div class="n">'+name+'</div>'
+    +'<div class="q">'+q+'</div>'
+    +'<div class="bar"><b style="width:'+Math.max(3,Math.min(100,g.pct))+'%;background:'+c+'"></b></div>'
+    +'</div><div class="r">'
+    +'<div class="v" style="color:'+c+'">'+val+(unit?'<span class="u">'+unit+'</span>':'')+'</div>'
+    +'<div class="lb" style="color:'+c+'">'+g.lb+'</div>'
+    +'</div></div>';
+  if(note) h+='<div class="rnote">'+note+'</div>';
+  return h;
+}
+function kvRow(k,v){ return '<div class="kv"><span class="k">'+k+'</span><span class="v num">'+v+'</span></div>'; }
+
+function renderFund(){
+  var el=document.getElementById('view-fund');
+  if(!el) return;
+  if(!fundPage){ el.innerHTML=''; return; }
+  var f=fundByCode(fundPage);
+  if(!f){ el.innerHTML='<div class="empty">基金不存在</div>'; return; }
+  var d=dataMap[f.code];
+  var s=calcSignal(f);
+  var m=d&&d.metrics?d.metrics:null;
+  var navNow=(d&&d.nav)?n(d.nav):null;
+
+  var h='';
+  /* 返回栏 */
+  h+='<button class="back" onclick="closeFund()">'
+    +'<span class="bic">‹</span><span class="btx">返回仪表盘</span>'
+    +'<span class="bsub">'+esc(shortName(f.name))+'</span></button>';
+
+  /* 头卡 */
+  h+='<div class="fhead"><div class="t">'+esc(f.name)+'</div>'
+    +'<div class="c"><span>'+f.code+'</span>'
+    +(f.cat?'<span class="pill">'+esc(f.cat)+'</span>':'')
+    +(f.etf?'<span class="pill">场内 '+f.etf+'</span>':'')
+    +(f.tp>0?'<span class="pill">止盈 '+f.tp+'%</span>':'<span class="pill">无止盈</span>')
+    +'</div>'
+    +'<div class="navrow"><span class="big num">'+(navNow?navNow.toFixed(4):'--')+'</span>'
+    +'<span class="ch num '+chgCls(d?n(d.navChg):null)+'">'+((d&&d.navChg!=null)?pct(d.navChg):'--')+'</span>'
+    +'<span class="dt">净值日期 '+(d&&d.navDate?d.navDate:'--')
+    +(d&&d.live?('<br>场内 '+esc(d.live.sym)+' '+d.live.price.toFixed(3)+' <b class="'+chgCls(d.live.chg)+'">'+pct(d.live.chg)+'</b>'):'')
+    +'</span></div></div>';
+
+  if(!d||!d.ok){
+    h+='<div class="empty">该基金数据未取到'
+      +((d&&d.errors&&d.errors.length)?('<br>'+esc(d.errors.join('；'))):'')
+      +'<br>请点右上角「刷新」重试</div>';
+    el.innerHTML=h; return;
+  }
+
+  /* ── ① 今日建议总结 ── */
+  h+='<div class="sect">① 今日建议总结<span class="hint">评分 '+s.score+' · '+s.label+'</span></div>';
+  var exAmt=n(s.detail.amountExtra), bsAmt=n(s.detail.amountBase);
+  var vCls=s.level==='stop'?'v-wait':(s.detail.amount>0?'v-go':(s.level==='wait'?'v-wait':'v-none'));
+  h+='<div class="verdict '+vCls+'">'
+    +'<div class="vtag">本周见鸡行事</div>'
+    +'<div class="vmain">'+(s.detail.amount>0?('加 '+money(s.detail.amount).replace(/\.00$/,'')+' 元'):'暂不投入')+'</div>'
+    +'<div class="vsub">'+esc(s.act)+'</div>'
+    +'<div class="vamt"><span>常规定投（周投 '+money(s.detail.week)+' × '+(s.detail.mult||0)+' 倍）</span>'
+    +'<b class="num" style="color:#3c4453;font-size:15px">'+money(bsAmt)+'</b></div>'
+    +(exAmt>0?('<div class="vamt"><span>年线额外补仓</span><b class="num">'+money(exAmt)+'</b></div>'):'')
+    +'</div>';
+
+  if(s.detail.retPct!=null && n(f.shares)>0){
+    h+='<div class="kvrow" style="margin:-4px 2px 8px"><span class="k">你的持仓</span><span class="v">'
+      +n(f.shares).toFixed(2)+' 份 · 市值 '+money(mvOf(f,d))
+      +' · 收益 <b class="'+chgCls(s.detail.retPct)+'">'+pct(s.detail.retPct)+'</b></span></div>';
+  }
+
+  /* 判断依据（原仪表盘上的理由列表，移到二级页） */
+  if(s.reason&&s.reason.length){
+    h+='<div class="pn"><h2>🧮 判断依据</h2><div class="reasons" style="margin-bottom:0">';
+    s.reason.forEach(function(r){
+      h+='<div class="rs '+(r.ok===false?'neg':'pos')+'"><span class="mk">'+(r.ok===false?'✗':'✓')+'</span><span>'+r.t+'</span></div>';
+    });
+    h+='</div></div>';
+  }
+
+  /* ── ② 长线位置（年线 + 半年线） ── */
+  h+='<div class="sect">② 长线位置<span class="tag">250 日年线 · 120 日半年线</span>'
+    +'<span class="hint">定长期值不值得花钱</span></div>';
+  var ch=maChart(d,s);
+  if(ch) h+=ch;
+  else h+='<div class="empty">'+(d.histAll
+    ?('净值样本不足 '+(MA_WIN+30)+' 个交易日，暂画不出长线位置图')
+    :('完整净值序列更新中…数据到位后自动显示'))+'</div>';
+
+  /* ── ③ 布林带 ── */
+  h+='<div class="sect">③ 布林带<span class="tag">20 日 · 2 倍标准差</span>'
+    +'<span class="hint">看这周买划不划算</span></div>';
+  if(m&&m.boll){
+    var b=m.boll, pinPct=Math.max(2,Math.min(98,s.detail.pctB==null?50:s.detail.pctB));
+    h+='<div class="boll-box"><div class="boll-head"><span>价格在通道里的位置（近 20 日）</span>'
+      +'<span class="num">'+fx(b.lower,4)+' ｜ '+fx(b.mid,4)+' ｜ '+fx(b.upper,4)+'</span></div>'
+      +'<div class="boll-track"><div class="boll-band"></div>'
+      +'<div class="boll-mid" style="left:50%"></div>'
+      +'<div class="boll-pin" style="left:'+pinPct+'%"></div>'
+      +'<div class="boll-pin-lb" style="left:'+pinPct+'%">'+fx(navNow,4)+'</div>'
+      +'</div><div class="boll-axis"><span>便宜（下轨）</span><span>中轨</span><span>偏贵（上轨）</span></div></div>';
+    if(navNow){
+      var gap=(navNow/b.lower-1)*100, tip;
+      if(gap<=0) tip='已跌破布林下轨，属于超卖区，是较好的分批买入区间。';
+      else if(gap<=1.5) tip='距下轨仅 '+gap.toFixed(2)+'%，已经很接近超卖区，可以开始小额分批。';
+      else if(gap<=5) tip='距下轨还有 '+gap.toFixed(2)+'%，未到理想买点，可等到跌近下轨再动手。';
+      else tip='距下轨还有 '+gap.toFixed(2)+'%，位置偏高，建议耐心等待回落。';
+      h+='<div class="buyline">'
+        +'<div class="r"><span class="k">当前净值</span><span class="v num">'+fx(navNow,4)+'</span></div>'
+        +'<div class="r"><span class="k">布林下轨（超卖触发）</span><span class="v num" style="color:#0a7d45">'+fx(b.lower,4)+'</span></div>'
+        +'<div class="r"><span class="k">布林中轨（20 日均线）</span><span class="v num">'+fx(b.mid,4)+'</span></div>'
+        +'<div class="r"><span class="k">布林上轨（偏高）</span><span class="v num" style="color:#c22">'+fx(b.upper,4)+'</span></div>'
+        +'<div class="r"><span class="k">通道宽度（波动收敛/扩张）</span><span class="v num">'+fx(b.width,2)+'%</span></div>'
+        +'<div class="hint">'+tip+'</div></div>';
+    }
+  }else{
+    h+='<div class="empty">净值样本不足 20 个交易日，算不出布林带</div>';
+  }
+
+  /* ── ④ 其他技术指标 ── */
+  h+='<div class="sect">④ 其他技术指标<span class="hint">全部按分红再投复权净值计算</span></div>';
+  if(m){
+    h+='<div class="pn">';
+    h+='<div class="sub2">均线偏离（负数=在均线下方）</div><div class="kvs">';
+    [5,10,20,60,120,250].forEach(function(w){
+      var x=m.ma[w];
+      h+='<div class="kv"><span class="k">距 '+w+' 日线</span><span class="v '+chgCls(x?x.dev:null)+'">'+(x?pct(x.dev):'--')+'</span></div>';
+    });
+    h+='</div>';
+    h+='<div class="sub2">历史分位（该窗口内价格所处位置）</div><div class="kvs">';
+    [20,60,120,250].forEach(function(w){
+      var p=m.pos['p'+w];
+      h+='<div class="kv"><span class="k">'+w+' 日分位</span><span class="v">'+(p==null?'--':p.toFixed(0)+'%')+'</span></div>';
+    });
+    h+='</div>';
+    h+='<div class="sub2">区间收益</div><div class="kvs">';
+    [['近 5 日','r5'],['近 10 日','r10'],['近 20 日','r20'],['近 60 日','r60'],['近 120 日','r120'],['近 250 日','r250'],['近 1 年','r1y']].forEach(function(x){
+      var v=m.rets[x[1]];
+      h+='<div class="kv"><span class="k">'+x[0]+'</span><span class="v '+chgCls(v)+'">'+(v==null?'--':pct(v))+'</span></div>';
+    });
+    h+='</div>';
+    h+='</div>';
+  }else{
+    h+='<div class="empty">数据未就绪</div>';
+  }
+
+  /* ── ⑤ 风险评估 ── */
+  var rk=riskOfFund(d);
+  h+='<div class="sect">⑤ 风险评估'
+    +'<span class="tag">'+(rk?('近 '+rk.win+' 个交易日'):'样本不足')+'</span>'
+    /* fromDate / toDate 是毫秒时间戳，必须过 dstr() 格式化，否则会原样吐出一串数字 */
+    +'<span class="hint">'+(rk?(dstr(rk.fromDate)+' ~ '+dstr(rk.toDate)):'')+'</span></div>';
+  if(!rk){
+    h+='<div class="empty">'+(d.histAll
+      ?'净值样本不足，算不出风险指标'
+      :'完整净值序列更新中…数据到位后自动计算')+'</div>';
+  }else{
+    h+=rvRow('夏普比率','同样的风险，谁赚得多？',
+      rk.sharpe==null?'--':rk.sharpe.toFixed(2),'',rvGrade('sharpe',rk.sharpe),
+      '年化收益 '+(rk.annArith>=0?'+':'')+rk.annArith.toFixed(1)+'% 减无风险利率 '+fx(rk.rf,1)+'%，除以年化波动率 '+rk.vol.toFixed(1)+'%。'
+      +'大于 1 算好，小于 0 说明承担了波动却没换来超过存款的收益。');
+    h+=rvRow('最大回撤','最坏情况，你能亏多少？',
+      rk.mdd==null?'--':rk.mdd.toFixed(1),'%',rvGrade('mdd',rk.mdd),
+      '这段时间里从最高点跌到最低点的幅度。历史上真跌过这么深，下次同样可能。');
+    h+=rvRow('年化波动率','上蹿下跳有多猛？',
+      rk.vol.toFixed(1),'%',rvGrade('vol',rk.vol),
+      '日涨跌的标准差折算成年化。数字越大，短期净值晃得越凶，也越容易拿不住。');
+    h+=rvRow('Calmar 比率','收益和回撤，哪个更划算？',
+      rk.calmar==null?'--':rk.calmar.toFixed(2),'',rvGrade('calmar',rk.calmar),
+      '年化收益 '+rk.annGeo.toFixed(1)+'% ÷ 最大回撤 '+rk.mdd.toFixed(1)+'%。衡量「为拿到这些收益，忍受了多大的坑」。');
+    if(rk.ir!=null){
+      h+=rvRow('信息比率','基金经理有没有跑赢指数？',
+        rk.ir.toFixed(2),'',rvGrade('ir',rk.ir),
+        '相对'+BENCH_NAME+'的年化超额 '+(rk.exAnn>=0?'+':'')+rk.exAnn.toFixed(1)+'% ÷ 跟踪误差 '+rk.te.toFixed(1)
+        +'%，按日期对齐 '+rk.aligned+' 天。正值代表跑赢指数，负值说明跑输、且承担了额外的偏离风险。');
+    }else{
+      h+=rvRow('信息比率','基金经理有没有跑赢指数？','--','',rvGrade('ir',null),
+        BENCH_INFO?('基准数据不足或与基金净值日对不齐，暂不计算（需至少 40 天对齐）')
+                  :('基准（'+BENCH_NAME+'）未取到，刷新后重试'));
+    }
+    h+='<div class="disc">风险指标口径：窗口取近 '+RISK_WIN+' 个交易日（不足则用全部可用样本），'
+      +'年化系数 250，无风险利率 '+fx(rk.rf,1)+'%/年。'
+      +'最大回撤与 Calmar 基于复权净值；信息比率相对 '+BENCH_NAME+'（'+BENCH_SYM+'）。'
+      +'这些是<b>同一只基金自身的历史统计</b>，不代表未来。</div>';
+  }
+
+  /* ── ⑥ 基金经理与规模 ── */
+  h+='<div class="sect">⑥ 基金经理与规模</div>';
+  var mi=mgrInfo(f,d);
+  if(d.mgr&&d.mgr.length){
+    var mg=d.mgr[0];
+    h+='<div class="pn">';
+    if(mi&&mi.changed){
+      h+='<div class="warn" style="margin-bottom:10px"><b>⚠ 基金经理已变更</b><br>'
+        +'上次记录为「'+esc(mi.prevOld)+'」（截至 '+esc(mi.prevOldAt)+'），现在是「'+esc(mi.now)+'」。'
+        +'换帅可能改变跟踪误差与持仓风格，此前的历史统计要打折看待，建议多看两期季报再决定是否加大投入。</div>';
+    }
+    h+='<div class="mgr-hd"><div class="mgr-av">'+esc(String(mg.name||'?').slice(0,1))+'</div>'
+      +'<div class="mgr-nm"><div class="n">'+esc(mi?mi.now:mg.name)
+      +(n(mg.star)>0?' <span style="color:#e8a33d;font-size:11px">'+stars(mg.star)+'</span>':'')+'</div>'
+      +'<div class="s">从业 '+(esc(mg.workTime||'--'))+'　在管 '+(esc(mg.fundSize||'--'))+'</div></div>'
+      +(mg.score!=null?('<div class="mgr-sc">'+mg.score.toFixed(1)+'<span class="u">经理评分</span></div>'):'')
+      +'</div>';
+    if(mg.profit&&Object.keys(mg.profit).length){
+      h+='<div class="kvs">';
+      Object.keys(mg.profit).forEach(function(k){
+        var v=mg.profit[k];
+        h+='<div class="kv"><span class="k">'+esc(k)+'</span><span class="v '+chgCls(v)+'">'+pct(v)+'</span></div>';
+      });
+      h+='</div>';
+      h+='<div class="disc" style="margin-top:8px">「任期收益」为该经理管理本基金以来的累计收益，'
+        +'与同类平均、沪深300 同期对比；数据截至 '+esc(mg.jzrq||'--')+'。</div>';
+    }
+    if(d.evalInfo&&d.evalInfo.avr!=null){
+      h+='<div class="sub2">基金五维评分　综合 '+fx(d.evalInfo.avr,2)+' 分</div><div class="kvs">';
+      d.evalInfo.categories.forEach(function(c,i){
+        var v=d.evalInfo.data[i];
+        h+='<div class="kv"><span class="k">'+esc(c)+'</span><span class="v">'+(v==null?'--':v.toFixed(1))+'</span></div>';
+      });
+      h+='</div>';
+    }else if(d.evalInfo){
+      h+='<div class="sub2">基金五维评分</div><div class="tip">该基金暂无此项评分（成立时间较短或未被评级）。</div>';
+    }
+    h+='</div>';
+  }else{
+    h+='<div class="empty">未取到基金经理信息（'+((d.proxy)?'代理取数不含该字段':'数据源未返回')+'）</div>';
+  }
+
+  /* 规模与资产配置 */
+  if(d.scale||d.alloc){
+    h+='<div class="pn"><h2>📊 规模与资产配置</h2>';
+    if(d.scale&&d.scale.vals.length){
+      var si=d.scale.vals.length-1;
+      h+='<div class="kvrow"><span class="k">最新规模（'+esc(d.scale.cats[si]||'')+'）</span>'
+        +'<span class="v">'+(d.scale.vals[si]==null?'--':d.scale.vals[si].toFixed(2)+' 亿元')
+        +(d.scale.mom[si]?('　<span class="'+(String(d.scale.mom[si]).indexOf('-')===0?'dn':'up')+'">'+esc(d.scale.mom[si])+'</span>'):'')+'</span></div>';
+    }
+    if(d.alloc&&d.alloc.items.length){
+      d.alloc.items.forEach(function(it){
+        h+='<div class="kvrow"><span class="k">'+esc(it.name)+'</span><span class="v">'
+          +(it.last==null?'--':fx(it.last,2)+(String(it.name).indexOf('资产')>=0?' 亿元':'%'))+'</span></div>';
+      });
+      h+='<div class="disc" style="margin-top:8px">截至 '+(d.alloc.cats.length?d.alloc.cats[d.alloc.cats.length-1]:'--')+'。</div>';
+    }
+    h+='</div>';
+  }
+
+  /* 数据来源与免责 */
+  h+='<div class="disc">净值数据：天天基金（'+d.bars+' 个交易日'
+    +(d.firstDate?'，'+d.firstDate+' 起':'')+(d.divCount?'，含 '+d.divCount+' 次分红事件':'')+'）'
+    +(d.proxy?'；本次经同源代理取数':'')
+    +'<br>基金经理与规模数据：天天基金，截至 '+(d.mgr&&d.mgr[0]?esc(d.mgr[0].jzrq||'--'):'--')
+    +'<br>本页仅供个人参考，不构成投资建议。</div>';
+
+  el.innerHTML=h;
 }
 
 function sigCard(f,s,d){
@@ -1474,41 +2132,22 @@ function sigCard(f,s,d){
      +(s.score>=60?'var(--go)':(s.score>=45?'var(--wait)':'var(--none)'))+'"></div></div>'
      +'<div style="font-size:13px;font-weight:900;color:'+sigColor(s.level)+'">'+s.score+'</div></div>';
 
-  /* 走势图 */
-  h+=maChart(d,s);
+  /* 迷你走势图（60 日复权净值 + 布林通道）：仪表盘只给形状，
+     完整的长线位置图（年线 + 半年线）在二级页 */
+  h+=spark(d);
 
-  /* 理由 */
-  h+='<div class="reasons">';
-  s.reason.forEach(function(r){
-    h+='<div class="rs '+(r.ok===false?'neg':'pos')+'"><span class="mk">'+(r.ok===false?'✗':'✓')+'</span><span>'+r.t+'</span></div>';
-  });
-  h+='</div>';
-
-  /* 布林位置条 */
-  if(b){
-    var pinPct=Math.max(2,Math.min(98,bollPct));
-    h+='<div class="boll-box"><div class="boll-head"><span>布林带位置（近20日）</span>'
-      +'<span class="num">'+fx(b.lower,4)+' ｜ '+fx(b.mid,4)+' ｜ '+fx(b.upper,4)+'</span></div>'
-      +'<div class="boll-track"><div class="boll-band"></div>'
-      +'<div class="boll-mid" style="left:50%"></div>'
-      +'<div class="boll-pin" style="left:'+pinPct+'%"></div>'
-      +'<div class="boll-pin-lb" style="left:'+pinPct+'%">'+fx(navNow,4)+'</div>'
-      +'</div><div class="boll-axis"><span>便宜</span><span>适中</span><span>偏贵</span></div></div>';
+  /* 双均线速览：年线管「长期值不值得花钱」，半年线看中期趋势有没有掉头 */
+  var dv250=s.detail.dev250, dv120=null, m120s=maWin(d,120);
+  if(m120s&&m120s[m120s.length-1]>0&&navNow) dv120=(navNow/m120s[m120s.length-1]-1)*100;
+  if(dv250!=null||dv120!=null){
+    h+='<div class="dline">'
+      +'<span>年线 <b class="'+(dv250==null?'':chgCls(dv250))+'">'+(dv250==null?'--':pct(dv250))+'</b></span>'
+      +'<span>半年线 <b class="'+(dv120==null?'':chgCls(dv120))+'">'+(dv120==null?'--':pct(dv120))+'</b></span>'
+      +'</div>';
   }
 
-  /* 买点参考价 */
-  if(b&&navNow){
-    var gap=(navNow/b.lower-1)*100;
-    var tip;
-    if(gap<=0) tip='已跌破布林下轨，属于超卖区，是较好的分批买入区间。';
-    else if(gap<=1.5) tip='距下轨仅 '+gap.toFixed(2)+'%，已经很接近超卖区，可以开始小额分批。';
-    else if(gap<=5) tip='距下轨还有 '+gap.toFixed(2)+'%，未到理想买点，可等到跌近下轨再动手。';
-    else tip='距下轨还有 '+gap.toFixed(2)+'%，位置偏高，建议耐心等待回落。';
-    h+='<div class="buyline"><div class="r"><span class="k">当前净值</span><span class="v num">'+fx(navNow,4)+'</span></div>'
-      +'<div class="r"><span class="k">布林下轨（超卖触发）</span><span class="v num" style="color:#0a7d45">'+fx(b.lower,4)+'</span></div>'
-      +'<div class="r"><span class="k">布林上轨（偏高）</span><span class="v num" style="color:#c22">'+fx(b.upper,4)+'</span></div>'
-      +'<div class="hint">'+tip+'</div></div>';
-  }
+  /* 理由明细、布林带位置条、买点参考价、技术指标网格一律移到二级页
+     —— 仪表盘保持「一眼看清该不该动手」，细节点下方入口 */
 
   /* 建议动作：定投与年线补仓分开列，免得两笔钱混成一个数字看不出补仓动了多少 */
   var exAmt=n(s.detail.amountExtra), bsAmt=n(s.detail.amountBase);
@@ -1518,34 +2157,16 @@ function sigCard(f,s,d){
   if(s.level==='stop') bk='已达止盈线，优先止盈';
   else if(!s.detail.mult) bk='评分不足，常规定投暂停';
   else bk='定投 '+money(s.detail.week)+' × '+s.detail.mult+' 倍 = '+money(bsAmt);
-  if(exAmt>0) bk+='<br>年线补仓 '+money(exAmt)+' 元（见下方年线计划）';
+  if(exAmt>0) bk+='<br>年线补仓 '+money(exAmt)+' 元（点下方进入看完整计划）';
   h+='<div class="act'+actCls+'"><div><div class="lb">见鸡行事</div>'+actTxt+'</div>'
      +'<div class="nt">'+bk+'<br>'+s.act+'</div></div>';
 
-  /* 指标详情 */
-  if(m){
-    var id='mg_'+f.code;
-    h+='<button class="more" onclick="togMore(\''+id+'\',this)">展开技术指标 ▾</button>';
-    h+='<div id="'+id+'" style="display:none">';
-    h+='<div class="mg">';
-    h+=mgItem('20日分位', s.detail.p20==null?'--':s.detail.p20.toFixed(0)+'%', s.detail.p20<30);
-    h+=mgItem('60日分位', s.detail.p60==null?'--':s.detail.p60.toFixed(0)+'%', s.detail.p60<30);
-    h+=mgItem('距20日均线', s.detail.dev20==null?'--':pct(s.detail.dev20), s.detail.dev20<0);
-    h+=mgItem('距60日均线', s.detail.dev60==null?'--':pct(s.detail.dev60), s.detail.dev60<0);
-    if(s.detail.dev250!=null) h+=mgItem('距250日年线', pct(s.detail.dev250), s.detail.dev250<0);
-    if(s.detail.pos250!=null) h+=mgItem('250日分位', s.detail.pos250.toFixed(0)+'%', s.detail.pos250<40);
-    h+=mgItem('近1年涨跌', m.rets.r1y==null?'--':pct(m.rets.r1y), m.rets.r1y<0);
-    h+=mgItem('近60日涨跌', m.rets.r60==null?'--':pct(m.rets.r60), m.rets.r60<0);
-    h+=mgItem('年化波动率', m.annVol==null?'--':m.annVol.toFixed(1)+'%', null);
-    h+=mgItem('近1年最大回撤', m.mdd250==null?'--':m.mdd250.toFixed(1)+'%', null);
-    if(s.detail.retPct!=null) h+=mgItem('你的持有收益', pct(s.detail.retPct), s.detail.retPct<0);
-    h+='</div>';
-    h+='<div class="disc" style="margin-top:8px">'
-      +'指标口径：按场外基金真实历史净值（分红再投复权）计算，样本 '+(d.bars||0)+' 个交易日'
-      +(d.firstDate?'（'+d.firstDate+' 起）':'')+(d.divCount?'，含 '+d.divCount+' 次分红事件':'')+'。'
-      +(d.proxy?'本图为经同源代理取数。':'')+'</div>';
-    h+='</div>';
-  }
+  /* 二级页入口 ·「核心要素」= 长线位置 / 布林带 / 技术指标 / 风险评估 / 基金经理 */
+  var mi=mgrInfo(f,d);
+  h+='<button class="fbtn" onclick="openFund(\''+f.code+'\')">'
+    +'本基金核心要素 · 长线位置 / 布林带 / 风险指标'
+    +(mi&&mi.changed?' <span style="color:#c22">⚠ 换帅</span>':'')
+    +'<span class="ar">›</span></button>';
 
   h+='</div></div>';
   return h;
@@ -1753,9 +2374,11 @@ function renderSet(){
   h+='</div>';
 
   h+='<div class="pn"><h2>⚙️ 参数设置</h2>'
-    +'<div class="tip">用于「持仓」页的结构预警：单只超过上限、或权益类合计超过上限时自动提示。</div>'
+    +'<div class="tip">占比上限用于「持仓」页的结构预警：单只超过上限、或权益类合计超过上限时自动提示。<br>'
+    +'无风险利率只用于二级页的<b>夏普比率</b>（年化收益减去它，再除以波动率），填你眼里「稳稳拿到」的利率即可。</div>'
     +'<div class="fr"><label>单只占比上限</label><input type="number" id="c_holdCap" value="'+n(cfg.holdCap,40)+'" min="10" max="100"><span class="unit">%</span></div>'
     +'<div class="fr"><label>权益合计上限</label><input type="number" id="c_totalCap" value="'+n(cfg.totalCap,75)+'" min="10" max="100"><span class="unit">%</span></div>'
+    +'<div class="fr"><label>无风险利率</label><input type="number" id="c_rf" value="'+fx(n(cfg.rf,RF_DEF),1)+'" min="0" max="10" step="0.1"><span class="unit">%/年</span></div>'
     +'<button class="btn btn-p sm" onclick="saveCfgForm()">保存参数</button></div>';
 
   h+='<div class="pn"><h2>📈 年线补仓计划（长线层）</h2>'
@@ -1843,7 +2466,16 @@ function renderSet(){
     +'<b>止盈</b>：收益率 =（份额 × 最新净值 − 累计投入）÷ 累计投入<br>'
     +'<b>「见鸡行事」</b>：金额 = 常规定投（周投基准 × 评分倍数）+ 年线补仓，两笔独立的钱<br>'
     +'<b>年线补仓</b>：250 日均线，用复权净值计算（未复权会被分红系统性压低）；'
-    +'只有通过分段回测验证的品种才给补仓金额</div></div>';
+    +'只有通过分段回测验证的品种才给补仓金额<br>'
+    +'<b>风险指标</b>：夏普 / 最大回撤 / 年化波动率 / Calmar / 信息比率，窗口取近 750 个交易日，'
+    +'信息比率相对沪深300 按日期逐日对齐；都在每只基金的二级页<br>'
+    +'<b>基金经理</b>：天天基金现任基金经理字段。首次读取只记基线，之后名字变化才提醒，旧名留档'
+    +'</div>'
+    +'<div class="disc">'
+    +'<b>页面结构</b>：一级页四个 —— 仪表盘（给结论与动作）、持仓、市场、设置。'
+    +'仪表盘上每只基金一张卡，点卡片进入该基金的二级页：今日建议总结 / 长线位置（年线 + 半年线）/ '
+    +'布林带 / 其他技术指标 / 风险评估 / 基金经理与规模。'
+    +'二级页可用 <code>?code=007466</code> 直接打开。</div></div>';
 
   document.getElementById('view-set').innerHTML=h;
 }
@@ -1979,6 +2611,9 @@ function delFund(i){
 function saveCfgForm(){
   cfg.holdCap=n(document.getElementById('c_holdCap').value,40);
   cfg.totalCap=n(document.getElementById('c_totalCap').value,75);
+  var rfEl=document.getElementById('c_rf');
+  if(rfEl) cfg.rf=n(rfEl.value,RF_DEF);
+  _riskCache={};                      // 无风险利率变了，风险指标缓存作废
   saveCfg(); renderAll(); alert('已保存');
 }
 /** 保存年线补仓参数（步长 / 分母 / 上限），只作用于该只基金 */
@@ -2040,9 +2675,12 @@ var _k=null;
 try{
   var _qs=new URLSearchParams(location.search);
   var _v=_qs.get('view');
+  if(_v&&VIEW_ALIAS[_v]) _v=VIEW_ALIAS[_v];              // 兼容 ?view=radar
   if(_v&&VIEWS.some(function(x){ return x.k===_v; })) curView=_v;
-  _k=_qs.get('skey');                     // 支持 ?skey=007466 直达搜索结果
-  if(_k){ curView='set'; SQ.key=_k; }
+  var _fc=_qs.get('code');                                // ?code=007466 直达某只基金的二级页
+  if(_fc){ fundPage=_fc; curView='dash'; }
+  _k=_qs.get('skey');                                     // 支持 ?skey=007466 直达搜索结果
+  if(_k){ curView='set'; fundPage=null; SQ.key=_k; }
 }catch(e){}
 renderAll();                       // 先用缓存/预置渲染，页面秒开
 if(CACHE_TS) document.getElementById('stamp').textContent='显示缓存（'+new Date(CACHE_TS).toLocaleString('zh-CN')+'），正在更新…';
