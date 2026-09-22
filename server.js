@@ -1,5 +1,5 @@
 /**
- * 小鸡快跑 · 基金加仓雷达 —— 可选后端
+ * 神鸡妙算 · 基金加仓雷达 —— 可选后端
  * ═══════════════════════════════════════════════════════════════════════
  * 说明：index.html 是**纯静态单文件**，在 GitHub Pages 等纯静态托管上可
  *       独立运行，不需要本文件。本文件用于两种情况：
@@ -167,7 +167,7 @@ const server = http.createServer(async (req, res) => {
   const P = u.pathname, q = u.searchParams;
 
   try {
-    if (P === '/api/ping') return sendJson(res, 200, { ok: true, name: '小鸡快跑', ts: Date.now() });
+    if (P === '/api/ping') return sendJson(res, 200, { ok: true, name: '神鸡妙算', ts: Date.now() });
 
     if (P === '/api/nav') {
       const code = (q.get('code') || '').trim();
@@ -212,7 +212,7 @@ server.listen(PORT, '0.0.0.0', () => {
   Object.keys(nets).forEach((k) => {
     (nets[k] || []).forEach((x) => { if (x.family === 'IPv4' && !x.internal) lan = x.address; });
   });
-  console.log('🐥 小鸡快跑 已启动');
+  console.log('🐔 神鸡妙算 已启动');
   console.log('   本机  http://localhost:' + PORT);
   if (lan) console.log('   手机  http://' + lan + ':' + PORT + '   （需与电脑同一 WiFi）');
 });

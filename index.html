@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="小鸡快跑">
-<title>小鸡快跑 · 基金加仓雷达</title>
+<meta name="apple-mobile-web-app-title" content="神鸡妙算">
+<title>神鸡妙算 · 基金加仓雷达</title>
 <style>
 :root{
   --bg:#f1f3f7;--card:#fff;--bd:#e3e7ee;--bd2:#eef1f5;
@@ -31,6 +31,7 @@ body{
 .hd-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hd h1{font-size:17px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:5px}
 .hd h1 .ck{font-size:19px;line-height:1}
+.hd h1 .sub{font-size:10px;font-weight:800;color:var(--brand);background:#eaf2fe;border-radius:5px;padding:2.5px 6px;letter-spacing:0;margin-left:2px;flex-shrink:0}
 .hd .st{font-size:10px;color:var(--faint);margin-top:1px}
 .btn-r{background:var(--brand);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit}
 .btn-r:active{opacity:.75}
@@ -253,7 +254,7 @@ footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint)
 <div class="hd">
   <div class="hd-top">
     <div>
-      <h1><span class="ck">🐥</span>小鸡快跑</h1>
+      <h1><span class="ck">🐔</span>神鸡妙算<span class="sub">基金加仓雷达</span></h1>
       <div class="st" id="stamp">正在取数…</div>
     </div>
     <button class="btn-r" id="btnRefresh" onclick="loadAll(true)">刷新</button>
@@ -277,7 +278,7 @@ footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint)
 
 <script>
 /* ═════════════════════════════════════════════════════════════════════
-   小鸡快跑 · 基金加仓雷达（纯静态单文件版）
+   神鸡妙算 · 基金加仓雷达（纯静态单文件版）
 
    · 数据全部在前端直连公开接口，无需任何后端，可直接放 GitHub Pages
      - 基金净值：fund.eastmoney.com/pingzhongdata/{code}.js（script 标签，不受 CORS 限制）
@@ -288,8 +289,29 @@ footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint)
    · 净值序列按「分红再投」复权，避免分红除息被误判为下跌
    ═════════════════════════════════════════════════════════════════════ */
 
-var LS_FUNDS = 'xjkp_funds', LS_CFG = 'xjkp_cfg', LS_CACHE = 'xjkp_cache';
-var OLD_KEYS = { funds:'fm_funds', cfg:'fm_cfg', cache:'fm_cache' };
+/* ── 存储键 ──
+   以站名「神鸡妙算」命名（sjm = shen ji miao suan）。
+   旧键按「新 → 旧」顺序兜底读取：换站名不会丢已保存的基金与参数。 */
+var LS_FUNDS = 'sjm_funds', LS_CFG = 'sjm_cfg', LS_CACHE = 'sjm_cache', LS_INDEX = 'sjm_index';
+var OLD_KEYS = {
+  funds: ['xjkp_funds', 'fm_funds'],
+  cfg  : ['xjkp_cfg',   'fm_cfg'  ],
+  cache: ['xjkp_cache', 'fm_cache'],
+  index: ['xjkp_index']
+};
+/** 依次尝试主键与旧键，返回第一个「解析成功且通过校验」的值；都不合格时返回第一个能解析的值 */
+function lsLoad(kind, mainKey, ok){
+  var keys=[mainKey].concat(OLD_KEYS[kind]||[]), first=null, i, v, o;
+  for(i=0;i<keys.length;i++){
+    v=null;
+    try{ v=localStorage.getItem(keys[i]); }catch(e){ v=null; }
+    if(v==null) continue;
+    try{ o=JSON.parse(v); }catch(e){ continue; }
+    if(first===null) first=o;
+    if(!ok || ok(o)) return o;
+  }
+  return first;
+}
 
 /* ── 预置基金 ──
    shares：持有份额（由 2026-09-16 账户截图反推，份额×当日净值=当日市值且昨日收益逐项吻合）
@@ -687,7 +709,6 @@ function marketAll(){
    清单会精简后存入 localStorage，下次打开直接命中，不再重复下载。
    备用通路：天天基金 fundsuggest（JSONP）→ 腾讯 smartbox（精确代码）→ 同源代理。
    ═══════════════════════════════════════════ */
-var LS_INDEX='xjkp_index';
 var FUND_INDEX=null;      // [{c:code, n:name}]
 var INDEX_LOADING=null;   // 复用同一个加载 Promise，避免并发重复拉取
 
@@ -697,7 +718,7 @@ function loadFundIndex(){
   INDEX_LOADING = new Promise(function(resolve, reject){
     // ① 先看本地缓存（30 天内有效）
     try{
-      var c=JSON.parse(localStorage.getItem(LS_INDEX)||'null');
+      var c=lsLoad('index', LS_INDEX, function(o){ return o && o.list && o.list.length; });
       if(c && c.t && (Date.now()-c.t) < 30*86400000 && c.list && c.list.length){
         FUND_INDEX=c.list; resolve(FUND_INDEX); return;
       }
@@ -744,7 +765,7 @@ function searchByIndex(key){
 
 function searchBySuggest(key){
   return new Promise(function(resolve){
-    var cb='xjkp_cb_'+Date.now()+'_'+Math.floor(Math.random()*10000);
+    var cb='sjm_cb_'+Date.now()+'_'+Math.floor(Math.random()*10000);
     var done=false, s=null;
     var to=setTimeout(function(){ finish([]); }, 20000);   // ES 后端首次查询偶发很慢
     function finish(list){
@@ -811,9 +832,7 @@ function searchFund(key){
 
 /* ═══════════════ 加载与缓存 ═══════════════ */
 function loadLocal(){
-  var raw=null;
-  try{ raw=JSON.parse(localStorage.getItem(LS_FUNDS)||'null'); }catch(e){}
-  if(!raw){ try{ raw=JSON.parse(localStorage.getItem(OLD_KEYS.funds)||'null'); }catch(e){} }   // 兼容旧键
+  var raw=lsLoad('funds', LS_FUNDS, function(o){ return o && o.length; });
   if(raw && raw.length){
     funds=raw.map(function(f){
       // 旧版只记录「持有金额」，没有份额 → 存到 holdOld 兜底显示，提示用户补填份额
@@ -826,12 +845,11 @@ function loadLocal(){
   } else {
     funds=JSON.parse(JSON.stringify(PRESET));
   }
-  try{ cfg=JSON.parse(localStorage.getItem(LS_CFG)||'null')||{}; }catch(e){ cfg={}; }
-  if(!cfg.holdCap){ try{ var oc=JSON.parse(localStorage.getItem(OLD_KEYS.cfg)||'null'); if(oc&&oc.holdCap) cfg=oc; }catch(e){} }
+  cfg=lsLoad('cfg', LS_CFG, function(o){ return o && o.holdCap!==undefined; })||{};
   if(cfg.holdCap===undefined) cfg.holdCap=40;
   if(cfg.totalCap===undefined) cfg.totalCap=75;
   try{
-    var c=JSON.parse(localStorage.getItem(LS_CACHE)||'null')||JSON.parse(localStorage.getItem(OLD_KEYS.cache)||'null');
+    var c=lsLoad('cache', LS_CACHE, function(o){ return o && (o.funds||o.mkt); });
     if(c&&c.funds){ c.funds.forEach(function(x){ if(x&&x.code&&x.metrics) dataMap[x.code]=x; }); CACHE_TS=c.t||0; }
     if(c&&c.mkt) mktData=c.mkt;
   }catch(e){}
@@ -1013,24 +1031,30 @@ function renderRadar(){
     }
   });
   var planAmt=scored.reduce(function(a,x){ return a+n(x.s.detail.amount); },0);
+  /* 小额观察（45~59 分，减半投）不计入「见鸡行事」的动作清单，但计入合计金额，故单独标注 */
+  var soft=scored.filter(function(x){ return x.s.level==='wait' && n(x.s.detail.amount)>0; });
 
   var h='';
 
-  /* 结论横幅 */
+  /* 结论横幅 ·「见鸡行事」= 看到信号才动手，所以标题直接给动作，读作「黄金A 加 50 元」 */
   if(!list.length){
-    h+='<div class="verdict v-none"><div class="vtag">当前结论</div><div class="vmain">还没有基金</div>'
+    h+='<div class="verdict v-none"><div class="vtag">神鸡妙算</div><div class="vmain">还没有基金</div>'
       +'<div class="vsub">去「设置」页添加你想跟踪的基金</div></div>';
   }else if(stop.length){
-    h+='<div class="verdict v-wait"><div class="vtag">当前结论</div><div class="vmain">🔔 '+stop.length+' 只已达止盈线</div>'
+    h+='<div class="verdict v-wait"><div class="vtag">本周见鸡行事</div><div class="vmain">🔔 '+stop.length+' 只已达止盈线</div>'
       +'<div class="vsub">'+stop.map(function(x){ return esc(x.f.name); }).join('、')+' 达到你设定的止盈目标，建议部分止盈锁定收益。</div></div>';
   }else if(go.length){
-    h+='<div class="verdict v-go"><div class="vtag">当前结论</div><div class="vmain">🐥 '+go.length+' 只基金可以加仓</div>'
+    var acts=go.map(function(x){
+      return esc(shortName(x.f.name))+' 加 '+money(x.s.detail.amount).replace(/\.00$/,'')+' 元';
+    }).join('、');
+    h+='<div class="verdict v-go"><div class="vtag">本周见鸡行事</div><div class="vmain">🐔 '
+      +(go.length<=3?acts:(go.length+' 只基金可以加仓'))+'</div>'
       +'<div class="vsub">'+go.map(function(x){ return esc(x.f.name)+'（评分 '+x.s.score+'）'; }).join('、')
       +'。按下方金额分批买入即可，不必一次买满。</div>'
-      +'<div class="vamt"><span>本周建议投入合计</span><b class="num">'+money(planAmt)+'</b></div></div>';
+      +'<div class="vamt"><span>本周建议投入合计'+(soft.length?'（另含 '+soft.length+' 只小额观察）':'')+'</span><b class="num">'+money(planAmt)+'</b></div></div>';
   }else{
     var best=scored.slice().sort(function(a,b){ return b.s.score-a.s.score; })[0];
-    h+='<div class="verdict v-none"><div class="vtag">当前结论</div><div class="vmain">⏸ 今天没有明确买点</div>'
+    h+='<div class="verdict v-none"><div class="vtag">本周见鸡行事</div><div class="vmain">⏸ 没有信号，本周不动手</div>'
       +'<div class="vsub">全部基金评分均低于 60 分，位置不够便宜。'
       +(best?'当前相对最优：'+esc(best.f.name)+'（评分 '+best.s.score+'）。':'')
       +'耐心持有，按原定投节奏继续即可。</div>'
@@ -1091,7 +1115,7 @@ function sigCard(f,s,d){
   var h='<div class="sig-card">';
   h+='<div class="sig-hd">';
   h+='<div class="sig-badge '+s.cls+'"><div class="ic">'
-     +(s.level==='go'?'🐥':(s.level==='stop'?'🔔':(s.level==='wait'?'🟡':'⚪')))
+     +(s.level==='go'?'🐔':(s.level==='stop'?'🔔':(s.level==='wait'?'🟡':'⚪')))
      +'</div><div class="tx">'+s.label+'</div></div>';
   h+='<div class="sig-info"><div class="nm">'+esc(f.name)+'</div><div class="cd">'
      +'<span>'+f.code+'</span>'
@@ -1159,7 +1183,7 @@ function sigCard(f,s,d){
   /* 建议动作 */
   var actCls=s.level==='go'?'':(s.level==='wait'?' w':' n');
   var actTxt=s.detail.amount>0?'<div class="vv num">'+money(s.detail.amount)+'</div>':'<div class="vv">暂不投入</div>';
-  h+='<div class="act'+actCls+'"><div><div class="lb">本周建议</div>'+actTxt+'</div>'
+  h+='<div class="act'+actCls+'"><div><div class="lb">见鸡行事</div>'+actTxt+'</div>'
      +'<div class="nt">'+(s.detail.mult?('基准 '+money(s.detail.week)+' × '+s.detail.mult+' 倍'):'等待更低位置')
      +'<br>'+s.act+'</div></div>';
 
@@ -1405,7 +1429,8 @@ function renderSet(){
     +'<b>复权口径</b>：净值序列按「分红再投」复权（用官方每日分红调整涨跌链式还原），末日等于最新单位净值<br>'
     +'<b>区间收益</b>：自算（复权、按最新净值日回看自然日），与基金公司公布的区间收益因起算日不同可能略有差异<br>'
     +'<b>信号门槛</b>：评分 ≥60 可加仓，45~59 小额观察，32~44 观望，&lt;32 暂不加仓<br>'
-    +'<b>止盈</b>：收益率 =（份额 × 最新净值 − 累计投入）÷ 累计投入</div></div>';
+    +'<b>止盈</b>：收益率 =（份额 × 最新净值 − 累计投入）÷ 累计投入<br>'
+    +'<b>「见鸡行事」</b>：看到评分信号才动手，不到 60 分不加仓</div></div>';
 
   document.getElementById('view-set').innerHTML=h;
 }
@@ -1496,7 +1521,7 @@ function exportData(){
   var blob=new Blob([JSON.stringify({funds:funds,cfg:cfg,ts:new Date().toISOString()},null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='小鸡快跑备份_'+today()+'.json';
+  a.download='神鸡妙算备份_'+today()+'.json';
   a.click();
 }
 function importData(){
@@ -1518,7 +1543,7 @@ function importData(){
   inp.click();
 }
 function clearCache(){
-  try{ localStorage.removeItem(LS_CACHE); localStorage.removeItem(OLD_KEYS.cache); }catch(e){}
+  try{ [LS_CACHE].concat(OLD_KEYS.cache).forEach(function(k){ localStorage.removeItem(k); }); }catch(e){}
   dataMap={}; mktData=[];
   renderAll(); loadAll(true);
 }
