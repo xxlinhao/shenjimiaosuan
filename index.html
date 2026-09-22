@@ -124,6 +124,15 @@ body{
 .matier .ev{display:inline-block;margin-left:4px;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;background:var(--go-bg);color:#0a6b43}
 .matier .ev.off{background:var(--none-bg);color:#6b7480}
 .matier .ref{color:#9aa1ac}
+/* 年线补仓计划：核心数字要足够大，一眼看到该补多少 */
+.maamt{margin:6px 0 3px;display:flex;align-items:baseline;gap:8px}
+.maamt .k{font-size:10.5px;color:#6b7480}
+.maamt b.num{font-size:21px;font-weight:800;color:#0a7d45;letter-spacing:-.5px;line-height:1.1}
+.macal{color:#7b838f;font-size:10px;line-height:1.5}
+.mabtn{margin-top:7px;padding:6px 12px;font-size:11px;font-weight:700;border-radius:8px;
+  border:1px solid #b9dfc9;background:#f1fbf5;color:#0a6b43;cursor:pointer;font-family:inherit}
+.mabtn:active{background:#e3f6ec}
+.marule{margin-top:7px;padding-top:5px;border-top:1px dashed var(--bd2);color:#9aa1ac;font-size:9.5px;line-height:1.5}
 
 /* 布林位置条 */
 .boll-box{background:var(--bg);border-radius:10px;padding:9px 10px 6px;margin-bottom:10px}
@@ -336,7 +345,7 @@ function lsLoad(kind, mainKey, ok){
    maMode：年线档位是否参与金额决策。'meanrev' 启用（品种的年线关系已回测验证）
            ｜ 'off' 仅展示不影响金额。默认值由回测结论给定，设置页可手动切换。 */
 var PRESET = [
-  { code:'007466', name:'华泰柏瑞中证红利低波ETF联接A', etf:'sh512890', cat:'红利低波', week:100, tp:10, shares:425.84, cost:700, on:true, maMode:'meanrev' },
+  { code:'007466', name:'华泰柏瑞中证红利低波ETF联接A', etf:'sh512890', cat:'红利低波', week:100, tp:10, shares:425.84, cost:700, on:true, maMode:'meanrev', maCfg:{ step:1, unit:10, cap:5 } },
   { code:'022459', name:'易方达中证A500ETF联接A',       etf:'sz159361', cat:'宽基成长', week:100, tp:12, shares:557.88, cost:700, on:true, maMode:'off' },
   { code:'000216', name:'华安黄金ETF联接A',             etf:'sh518880', cat:'商品对冲', week:50,  tp:0,  shares:60.14,  cost:200, on:true, maMode:'off' }
 ];
@@ -540,6 +549,77 @@ function maState(f,d){
   st.why='已回测验证，参与金额决策';
   return st;
 }
+/* ═══════════════ 长线补仓计划（年线分档 · 按持仓市值比例） ═══════════════
+   规则（2026-09-22 定稿）：
+     · 年线上方 5% 以内 → 正常定投，不额外增加
+     · 低于年线每 step% 一档：−1% 补 持仓市值×1/unit，−2% 补 2/unit，逐档累加
+     · 回到年线上方后本轮结束，档位归零，等下一轮重新开始
+     · 累计补仓封顶 cap 倍持仓市值，防止极端行情一次性打光弹药
+
+   回测口径（007466 红利低波，2020-08 ~ 2026-09，6.1 年，分红再投复权）：
+     · 12 轮跌破年线，触发 29 笔，累计 5541 元（8 倍持仓市值），年均 910 元
+     · 最深一轮 2026-05-15 起跌到 −9.03%，历时 74 自然日、分 9 笔、合计 4.5 倍市值
+     · 各档补仓后 250 日超额 +5.6% ~ +8.4%，前后半段符号一致（唯一通过分段检验的品种）
+     · 但同样一笔钱平摊定投能多买约 7% 份额 —— 补仓的钱必须是「定投之外多出来的」，
+       不能靠压缩定投来腾。 */
+var MA_CFG_DEF = { step:1, unit:10, cap:5 };
+function maCfgOf(f){
+  var c=(f&&f.maCfg)||{};
+  var o={ step:n(c.step,MA_CFG_DEF.step), unit:n(c.unit,MA_CFG_DEF.unit), cap:n(c.cap,MA_CFG_DEF.cap) };
+  if(!(o.step>0)) o.step=MA_CFG_DEF.step;
+  if(!(o.unit>0)) o.unit=MA_CFG_DEF.unit;
+  if(!(o.cap>=0)) o.cap=MA_CFG_DEF.cap;
+  return o;
+}
+/** 当前偏离落在第几档：0 = 未达 −step%（不补仓），k = 已跌进 −k×step%
+    注意：传进来的 dev 与 metrics.ma[250].dev 同口径，已是「百分比数值」(-2.31 即 −2.31%)，
+    不能再乘 100。 */
+function maKOf(dev,step){
+  if(dev==null||!isFinite(dev)||dev>=0) return 0;
+  var k=Math.floor(-dev/step);
+  return k>0?k:0;
+}
+/** 补到第 k 档的累计金额 = M × (1+2+…+k) / unit */
+function maCumAmt(M,k,unit){ return M*(k*(k+1)/2)/unit; }
+/** 由「累计封顶倍数」反解最高可补到第几档：k(k+1)/2/unit ≤ cap */
+function maKMax(cap,unit){
+  if(!(cap>0)) return 999;
+  var k=Math.floor((Math.sqrt(1+8*cap*unit)-1)/2);
+  return k<1?1:k;
+}
+/** 汇总某只基金的年线补仓计划（卡片、设置页、结论横幅共用） */
+function maPlan(f,d){
+  var st=maState(f,d), M=mvOf(f,d), c=maCfgOf(f);
+  var p={ st:st, dev:st.dev, M:M, cfg:c, k:0, kDone:0, due:[], amount:0,
+          cum:0, cumCap:0, capped:false, kMax:999, ok:false, why:st.why, paid:null };
+  if(st.dev==null||!st.on){ return p; }
+  p.k      = maKOf(st.dev,c.step);
+  p.kMax   = maKMax(c.cap,c.unit);
+  var pa   = (f&&f.maPaid)||{};
+  p.paid   = pa;
+  p.kDone  = n(pa.max,0);
+  if(!(M>0)){ p.why='未填持仓份额，算不出补仓金额（设置页补上份额即可）'; return p; }
+  p.cumCap = maCumAmt(M,Math.min(p.k>0?p.k:0,p.kMax),c.unit);
+  if(p.k<=0){ p.ok=true; p.why='年线上方，正常定投、不额外补仓'; return p; }
+  if(p.kDone>=p.kMax){ p.capped=true; }
+  var from=Math.min(p.kDone,p.kMax), to=Math.min(p.k,p.kMax), t;
+  for(t=from+1;t<=to;t++) p.due.push(t);
+  for(t=0;t<p.due.length;t++) p.amount += M*p.due[t]/c.unit;
+  p.cum = maCumAmt(M,to,c.unit);          // 补到目标档后的累计
+  p.ok  = true;
+  if(p.due.length){
+    /* 跌破的档位比上限更深时，金额按上限截断，文案要说清是「截断」而不是「到这一档」 */
+    p.why = (p.k>p.kMax)
+      ? '已跌进 −'+(p.k*c.step)+'% 档，超出 '+c.cap+' 倍市值上限，只按上限补到 −'+(p.kMax*c.step)+'% 档'
+      : '已跌进 −'+(p.due[p.due.length-1]*c.step)+'% 档，需补仓';
+  }
+  else if(p.capped) p.why='本轮累计已到 '+c.cap+' 倍市值上限，不再加码';
+  else p.why='本轮已补到 −'+(p.kDone*c.step)+'% 档，等更深档位';
+  return p;
+}
+/** 档位 → 该档单笔金额（设置页档位表用） */
+function maTierAmt(M,k,unit){ return M*k/unit; }
+
 /** 档位对应的说明文案（用于卡片与设置页） */
 function maTierDesc(dev){
   var t=maTierOf(dev);
@@ -595,9 +675,11 @@ function calcSignal(f){
   r.score=Math.round(s1+s2+s3+s4+s5);
   r.detail={ pctB:pctB, p20:p20, p60:p60, dev20:dev20, dev60:dev60, dev250:dev250, pos250:pos250,
              s:{boll:s1,mid:s2,short:s3,ma:s4,long:s5} };
-  /* 年线档位（长线层）在这里就算好：止盈分支会提前 return，但它同样需要在卡片上展示 */
+  /* 年线补仓计划在这里就算好：止盈分支会提前 return，但它同样需要在卡片上展示 */
   var maSt=maState(f,d);
+  var maP=maPlan(f,d);
   r.detail.ma=maSt;
+  r.detail.plan=maP;
 
   /* 止盈优先 */
   var retPct=null;
@@ -640,27 +722,30 @@ function calcSignal(f){
   if(dev250!=null && dev250<-5) pool.push({t:'低于250日年线 '+Math.abs(dev250).toFixed(1)+'%，长周期也在低位',w:3,ok:true});
   if(dev250!=null && dev250>8) pool.push({t:'高出250日年线 '+dev250.toFixed(1)+'%，长周期偏高',w:2,ok:false});
 
-  if(maSt.on && maSt.tier && maSt.tier.mult!==1){
-    pool.push({t:'年线档位「'+maSt.tier.name+'」：偏离年线 '+pct(maSt.dev)
-      +'，长线倍数 ×'+maSt.tier.mult+'（'+maSt.tier.ref+'）', w:3, ok:maSt.tier.mult>1});
+  if(maP.k>0 && maP.due.length){
+    pool.push({t:'已跌到年线下方 '+Math.abs(maP.dev).toFixed(2)+'%，触发第 '+maP.k
+      +' 档补仓（持仓市值的 '+maP.k+'/'+maP.cfg.unit+'）', w:4, ok:true});
+  }else if(maP.k>0){
+    pool.push({t:'年线下方 '+Math.abs(maP.dev).toFixed(2)+'%，本轮已补到第 '+(maP.kDone||0)+' 档', w:2, ok:true});
   }
 
   pool.sort(function(a,b){ return b.w-a.w; });
   r.reason=pool.slice(0,3);
 
   var mult = r.score>=75?2 : (r.score>=60?1 : (r.score>=45?0.5 : 0));
-  /* ── 长线（年线档位）× 短线（评分倍数）──
-     两层相乘并设 5 倍上限：避免「年线历史极值 × 评分满分」叠成 5 倍以上，
-     一次性把预算打光。长线机会要按周摊开，不抢跑。
-     年线未启用（off / 样本不足）时 maMult 恒为 1，金额与旧版完全一致。 */
+  /* ── 金额 = 常规定投 + 年线额外补仓（加法，不再相乘）──
+     定投是「每周都要买的钱」，补仓是「跌破年线才掏的钱」，两者性质不同：
+     混成一个倍数会让人误以为定投也跟着放大，也看不出补仓到底动了多少。
+     年线未启用 / 样本不足 / 未填份额时，补仓额恒为 0，定投部分与旧版一致。 */
   r.detail.mult=mult;
-  r.detail.maMult=maSt.on?maSt.mult:1;
-  var fm=mult*r.detail.maMult;
-  if(fm>5) fm=5;
-  r.detail.finalMult=fm;
-  r.detail.amount=Math.round(n(f.week)*fm);
-  r.detail.amountScore=Math.round(n(f.week)*mult);   // 仅按评分（未叠年线），用于对照展示
+  r.detail.maMult=1;
   r.detail.week=n(f.week);
+  r.detail.amountBase=Math.round(n(f.week)*mult);
+  /* 补仓额保留两位小数：它由「持仓市值 × k/unit」算出，取整会让卡片（207.79）
+     与合计（208.00）对不上，也跟公式展示矛盾。定投部分保持整数。 */
+  r.detail.amountExtra=Math.round((maP.amount||0)*100)/100;
+  r.detail.amount=Math.round((r.detail.amountBase+r.detail.amountExtra)*100)/100;
+  r.detail.amountScore=r.detail.amountBase;
   return r;
 }
 
@@ -969,6 +1054,13 @@ function loadLocal(){
         for(var k=0;k<PRESET.length;k++){ if(PRESET[k].code===f.code){ p=PRESET[k]; break; } }
         f.maMode=p?(p.maMode||'off'):'off';
       }
+      // 年线补仓参数：老数据没有就补默认值（每 1% 一档 / 分母 10 / 上限 5 倍市值）
+      if(f.maCfg===undefined){
+        var q=null;
+        for(var k2=0;k2<PRESET.length;k2++){ if(PRESET[k2].code===f.code){ q=PRESET[k2]; break; } }
+        f.maCfg = (q&&q.maCfg) ? { step:q.maCfg.step, unit:q.maCfg.unit, cap:q.maCfg.cap }
+                               : { step:MA_CFG_DEF.step, unit:MA_CFG_DEF.unit, cap:MA_CFG_DEF.cap };
+      }
       return f;
     });
   } else {
@@ -1195,19 +1287,43 @@ function maChart(d,s){
   });
   h+='</div>';
 
-  /* 年线档位：一眼看出"现在这位置历史上值多少钱"
-     注意：档位表里的回测数字来自红利低波（唯一通过分段验证的品种），
-     只在「已启用」时才展示，避免把别的品种的统计结果贴到黄金/A500 上误导人。 */
-  if(st){
-    if(st.on && st.tier){
-      h+='<div class="matier">年线档位 <b>'+st.tier.name+'</b>'
-        +'　长线倍数 <b>×'+st.tier.mult+'</b><span class="ev">已启用</span>'
-        +'<br><span class="ref">回测依据：'+esc(st.tier.ref)+'</span></div>';
+  /* 年线补仓计划：直接回答「这一档该补多少钱」
+     只有通过分段检验的品种（当前仅红利低波）才给金额；
+     未验证的品种只显示位置，避免把别的品种的回测结论贴上去误导人。 */
+  var plan=s&&s.detail?s.detail.plan:null;
+  if(st&&plan&&plan.ok&&plan.dev!=null){
+    var pstep=plan.cfg.step, punit=plan.cfg.unit, pcode=(d&&d.code)?d.code:'';
+    if(plan.k>0){
+      h+='<div class="matier">年线补仓　当前 <b>'+pct(plan.dev)+'</b><span class="ev">低于年线</span>';
+      if(plan.due.length){
+        h+='<div class="maamt"><span class="k">本次额外补仓</span><b class="num">'+money(plan.amount)+'</b></div>'
+          +'<div class="macal">持仓市值 '+money(plan.M)+' × ('+plan.due.join('+')+')/'+punit
+          +'　→ 补到 −'+(plan.k*pstep)+'% 档</div>'
+          +'<button class="mabtn" onclick="maMarkPaid(\''+pcode+'\')">标记已补 '+money(plan.amount)+' 元</button>';
+      }else if(plan.capped){
+        h+='<div class="maamt"><span class="k">本次额外补仓</span><b class="num">0.00</b></div>'
+          +'<div class="macal">本轮累计已达 '+plan.cfg.cap+' 倍市值（约 '+money(plan.cumCap)+' 元）上限，不再加码</div>';
+      }else{
+        h+='<div class="maamt"><span class="k">本次额外补仓</span><b class="num">0.00</b></div>'
+          +'<div class="macal">本轮已补到 −'+(plan.kDone*pstep)+'% 档，跌得更深才需要再补</div>';
+      }
+      h+='<div class="marule">回测（6.1 年）：−1% 起逐档补，之后 250 日超额 +5.6%~+8.4%、前后半段符号一致；'
+        +'最深一轮 −9.03% 历时 74 天、分 9 笔、共 4.5 倍市值</div></div>';
     }else{
-      h+='<div class="matier">年线位置 <b>'+(st.tier?st.tier.name:'--')+'</b>'
-        +'<span class="ev off">不参与金额</span>'
-        +'<br><span class="ref">'+esc(st.why||'未启用')+'</span></div>';
+      h+='<div class="matier">年线补仓　当前 <b>'+pct(plan.dev)+'</b><span class="ev off">年线上方</span>'
+        +'<br><span class="ref">正常定投、不额外补仓；跌破年线 −'+pstep+'% 起开始分档补</span>';
+      /* 回到年线上方 → 上一轮该收尾了。不自动重置：万一是年线附近来回震荡，
+         自动归零会导致同一档被反复补，交给用户自己确认。 */
+      if(plan.kDone>0){
+        h+='<br><button class="mabtn" onclick="maResetCycle(\''+pcode+'\')">'
+          +'结束上一轮（曾补到 −'+(plan.kDone*pstep)+'%）</button>';
+      }
+      h+='</div>';
     }
+  }else if(st){
+    h+='<div class="matier">年线位置 <b>'+(st.tier?st.tier.name:'--')+'</b>'
+      +'<span class="ev off">不参与金额</span>'
+      +'<br><span class="ref">'+esc((plan&&plan.why)||st.why||'未启用')+'</span></div>';
   }
   h+='</div>';
   return h;
@@ -1231,7 +1347,10 @@ function renderRadar(){
       if(dc.v!=null){ dayPnl+=mv*(dc.v/100)/(1+dc.v/100); if(!daySrc) daySrc=dc.src; }
     }
   });
-  var planAmt=scored.reduce(function(a,x){ return a+n(x.s.detail.amount); },0);
+  /* 合计拆成两笔：常规定投（评分驱动）+ 年线补仓（长线位置驱动） */
+  var planBase=scored.reduce(function(a,x){ return a+n(x.s.detail.amountBase); },0);
+  var planExtra=scored.reduce(function(a,x){ return a+n(x.s.detail.amountExtra); },0);
+  var planAmt=planBase+planExtra;
   /* 小额观察（45~59 分，减半投）不计入「见鸡行事」的动作清单，但计入合计金额，故单独标注 */
   var soft=scored.filter(function(x){ return x.s.level==='wait' && n(x.s.detail.amount)>0; });
 
@@ -1252,11 +1371,21 @@ function renderRadar(){
       +(go.length<=3?acts:(go.length+' 只基金可以加仓'))+'</div>'
       +'<div class="vsub">'+go.map(function(x){ return esc(x.f.name)+'（评分 '+x.s.score+'）'; }).join('、')
       +'。按下方金额分批买入即可，不必一次买满。</div>'
-      +'<div class="vamt"><span>本周建议投入合计'+(soft.length?'（另含 '+soft.length+' 只小额观察）':'')+'</span><b class="num">'+money(planAmt)+'</b></div></div>';
+      +'<div class="vamt"><span>本周建议投入合计'+(soft.length?'（另含 '+soft.length+' 只小额观察）':'')+'</span><b class="num">'+money(planAmt)+'</b></div>'
+      +(planExtra>0?('<div class="vsub" style="margin-top:5px">其中：常规定投 '+money(planBase)+' 元　+　<b>年线补仓 '+money(planExtra)+' 元</b></div>'):'')
+      +'</div>';
+  }else if(planExtra>0){
+    /* 评分没买点、但年线已跌破 —— 两套信号独立，不能因为评分低就漏掉长线补仓 */
+    h+='<div class="verdict v-go"><div class="vtag">本周见鸡行事</div><div class="vmain">📉 评分无买点，但年线已触发补仓</div>'
+      +'<div class="vsub">评分都在 60 分以下（短线不便宜），可是已经跌破 250 日年线，按长线计划补。'
+      +'两个信号各管一段：评分管「这周买划不划算」，年线管「这个位置长期值不值得花钱」。</div>'
+      +'<div class="vamt"><span>本周建议投入合计</span><b class="num">'+money(planAmt)+'</b></div>'
+      +'<div class="vsub" style="margin-top:5px">其中：常规定投 '+money(planBase)+' 元　+　<b>年线补仓 '+money(planExtra)+' 元</b></div>'
+      +'</div>';
   }else{
     var best=scored.slice().sort(function(a,b){ return b.s.score-a.s.score; })[0];
     h+='<div class="verdict v-none"><div class="vtag">本周见鸡行事</div><div class="vmain">⏸ 没有信号，本周不动手</div>'
-      +'<div class="vsub">全部基金评分均低于 60 分，位置不够便宜。'
+      +'<div class="vsub">全部基金评分均低于 60 分、且都在年线上方，位置不够便宜。'
       +(best?'当前相对最优：'+esc(best.f.name)+'（评分 '+best.s.score+'）。':'')
       +'耐心持有，按原定投节奏继续即可。</div>'
       +(planAmt>0?'<div class="vamt"><span>本周建议投入合计</span><b class="num" style="color:#a86f00">'+money(planAmt)+'</b></div>':'')
@@ -1381,16 +1510,15 @@ function sigCard(f,s,d){
       +'<div class="hint">'+tip+'</div></div>';
   }
 
-  /* 建议动作 */
-  var actCls=s.level==='go'?'':(s.level==='wait'?' w':' n');
+  /* 建议动作：定投与年线补仓分开列，免得两笔钱混成一个数字看不出补仓动了多少 */
+  var exAmt=n(s.detail.amountExtra), bsAmt=n(s.detail.amountBase);
+  var actCls=(s.level==='go'||exAmt>0)?'':(s.level==='wait'?' w':' n');
   var actTxt=s.detail.amount>0?'<div class="vv num">'+money(s.detail.amount)+'</div>':'<div class="vv">暂不投入</div>';
   var bk;
   if(s.level==='stop') bk='已达止盈线，优先止盈';
-  else if(!s.detail.mult) bk='等待更低位置';
-  else{
-    bk='基准 '+money(s.detail.week)+' × '+s.detail.mult+' 倍（评分）';
-    if(s.detail.maMult&&s.detail.maMult!==1) bk+=' × '+s.detail.maMult+' 倍（年线）';
-  }
+  else if(!s.detail.mult) bk='评分不足，常规定投暂停';
+  else bk='定投 '+money(s.detail.week)+' × '+s.detail.mult+' 倍 = '+money(bsAmt);
+  if(exAmt>0) bk+='<br>年线补仓 '+money(exAmt)+' 元（见下方年线计划）';
   h+='<div class="act'+actCls+'"><div><div class="lb">见鸡行事</div>'+actTxt+'</div>'
      +'<div class="nt">'+bk+'<br>'+s.act+'</div></div>';
 
@@ -1594,20 +1722,26 @@ function renderSet(){
     +'<div class="disc">只支持场外基金（6 位代码）。名称含「ETF联接」的会自动匹配对应场内 ETF，用来显示今日盘中参考。</div>'
     +'</div>';
 
-  h+='<div class="pn"><h2>📋 我的基金</h2><div class="tip">周投基准用于计算建议加仓金额；止盈线填 0 表示不设止盈。「年线」按钮控制该基金是否用 250 日年线档位调整金额。</div>';
+  h+='<div class="pn"><h2>📋 我的基金</h2><div class="tip">周投基准是每周常规定投的钱，与年线补仓是两笔独立的钱。「年线」按钮控制该基金是否按 250 日年线分档补仓。</div>';
   if(!funds.length){
     h+='<div class="empty">列表为空</div>';
   }else{
     funds.forEach(function(f,i){
       var d=dataMap[f.code];
       var st=maState(f,d);
+      var mpp=maPlan(f,d);
+      var maLine;
+      if(!st.on) maLine=' · '+(st.why||'未启用');
+      else if(mpp.k>0&&mpp.due.length) maLine=' · <b style="color:#0a6d43">本次待补 '+money(mpp.amount)+' 元</b>（−'+(mpp.k*mpp.cfg.step)+'% 档）';
+      else if(mpp.k>0) maLine=' · 已补到 −'+(mpp.kDone*mpp.cfg.step)+'% 档，等更深';
+      else maLine=' · 年线上方，正常定投不补仓';
       h+='<div class="mgmt"><div class="nm"><div class="t">'+esc(f.name)+'</div>'
         +'<div class="s">'+f.code+(f.etf?' · 场内 '+f.etf:' · 无场内ETF')+' · 周投 '+money(n(f.week))
         +' · '+(f.tp>0?'止盈 '+f.tp+'%':'无止盈')
         +(d&&d.nav?' · 净值 '+fx(d.nav,4):'')+(d&&d.navDate?'（'+d.navDate+'）':'')+'</div>'
         +'<div class="s" style="color:'+(st.on?'#0a6b43':'#aab2c0')+'">年线：'
         +(st.dev==null?'暂无年线':'偏离 '+pct(st.dev)+(st.tier?' · '+st.tier.name:''))
-        +(st.on?' · 参与金额决策（倍数 ×'+(st.tier?st.tier.mult:1)+'）':' · '+(st.why||'未启用'))+'</div></div>'
+        +maLine+'</div></div>'
         +'<div class="mgmt-ops">'
         +'<button onclick="editFund('+i+')">编辑</button>'
         +'<button onclick="toggleFund('+i+')">'+(f.on===false?'启用':'停用')+'</button>'
@@ -1624,21 +1758,70 @@ function renderSet(){
     +'<div class="fr"><label>权益合计上限</label><input type="number" id="c_totalCap" value="'+n(cfg.totalCap,75)+'" min="10" max="100"><span class="unit">%</span></div>'
     +'<button class="btn btn-p sm" onclick="saveCfgForm()">保存参数</button></div>';
 
-  h+='<div class="pn"><h2>📈 年线档位（长线层）</h2>'
-    +'<div class="tip">把「这个品种现在值不值得花钱」和「这周买划不划算」分开算：'
-    +'年线档位给长线倍数，评分给短线倍数，两者相乘得到建议金额（上限 5 倍周投基准）。</div>';
-  h+='<table class="tb"><thead><tr><th style="text-align:left">偏离 250 日年线</th><th style="text-align:left">档位</th><th>长线倍数</th></tr></thead><tbody>';
-  MA_TIERS.forEach(function(t){
-    h+='<tr><td class="nm">'+maRange(t)+'</td>'
-      +'<td style="text-align:left;font-size:11px;color:#5f6875">'+t.name+'</td>'
-      +'<td>×'+t.mult+'</td></tr>';
-  });
-  h+='</tbody></table>';
-  h+='<div class="disc"><b>为什么黄金和 A500 默认不在这个体系里？</b><br>'
-    +'把历史切成前后两段、复测「偏离年线 → 之后收益」的关系：只有红利低波两个子样本符号一致，关系稳定；'
-    +'黄金 250 日前瞻下有 4 个档位方向翻转，A500 年线样本只有 203 天。'
-    +'所以这两只默认只展示年线位置、不影响金额，需要时用上面基金行里的「年线」按钮手动启用（会先提醒风险）。<br>'
-    +'每只基金的历史长度、各档位前瞻收益、事件次数等回测细节，见交付目录里的 README。</div></div>';
+  h+='<div class="pn"><h2>📈 年线补仓计划（长线层）</h2>'
+    +'<div class="tip">规则：年线上方正常定投、不额外增加；<b>跌破年线后每档 1%</b>，'
+    +'−1% 档补「持仓市值 × 1/10」、−2% 档补 2/10，逐档累加（越跌补越多）；'
+    +'净值回到年线上方即本轮结束，档位归零。<br>'
+    +'关键：补仓是<b>定投之外多出来的钱</b>，不动常规定投。回测显示，同样一笔钱若靠压缩定投腾挪，平摊定投反而多买约 7% 份额。</div>';
+
+  var maF=null, mfi;
+  for(mfi=0;mfi<funds.length;mfi++){ if(funds[mfi].maMode==='meanrev'){ maF=funds[mfi]; break; } }
+  var maM=maF?mvOf(maF,dataMap[maF.code]):null;
+  var mc=maF?maCfgOf(maF):MA_CFG_DEF;
+
+  if(!maF){
+    h+='<div class="disc" style="margin-top:0">还没有基金启用年线补仓。到上面「我的基金」里点某只基金的「年线」按钮即可启用。</div>';
+  }else if(!(maM>0)){
+    h+='<div class="disc" style="margin-top:0">「'+esc(maF.name)+'」还没填持仓份额，算不出补仓金额。先点「编辑」把份额填上。</div>';
+  }else{
+    h+='<div class="disc" style="margin-top:0">基准：「'+esc(maF.name)+'」当前持仓市值 <b>'+money(maM)+'</b> 元'
+      +'（'+fx(maF.shares,2)+' 份 × 净值 '+fx(dataMap[maF.code]&&dataMap[maF.code].nav,4)+'）</div>';
+    h+='<table class="tb"><thead><tr><th style="text-align:left">触发</th><th>该档补仓</th><th>累计已补</th></tr></thead><tbody>';
+    for(var mkk=1;mkk<=9;mkk++){
+      var oneAmt=maM*mkk/mc.unit, cumAmt=maCumAmt(maM,mkk,mc.unit);
+      h+='<tr><td class="nm">低于年线 '+mkk+'%</td>'
+        +'<td class="num">'+money(oneAmt)+'</td>'
+        +'<td class="num">'+money(cumAmt)+' <span style="color:#9aa1ac;font-size:9.5px">'+(cumAmt/maM).toFixed(1)+'×</span></td></tr>';
+    }
+    h+='</tbody></table>';
+    h+='<div class="disc"><b>弹药上限</b>：默认 '+mc.cap+' 倍持仓市值（约 '+money(maM*mc.cap)+' 元），'
+      +'即最多补到 −'+maKMax(mc.cap,mc.unit)+'% 档。<br>'
+      +'回测（6.1 年）：共 12 轮跌破年线、触发 29 笔、累计 8 倍市值，年均仅 910 元；'
+      +'但单轮最深一次到 −9.03%（2026-05），历时 74 天分 9 笔共 4.5 倍市值 —— 上限设 5 倍可覆盖这个历史极值。</div>';
+  }
+
+  if(maF && maM>0){
+    h+='<button class="more" onclick="togMore(\'ma_cfg\',this)">调整参数 ▾</button>';
+    h+='<div id="ma_cfg" style="display:none">';
+    h+='<div class="fr"><label>档位步长</label><input type="number" id="ma_step" value="'+mc.step+'" min="0.5" max="5" step="0.5"><span class="unit">%</span></div>';
+    h+='<div class="fr"><label>分母（1/几 市值）</label><input type="number" id="ma_unit" value="'+mc.unit+'" min="2" max="50"><span class="unit">份</span></div>';
+    h+='<div class="fr"><label>本轮累计上限</label><input type="number" id="ma_cap" value="'+mc.cap+'" min="0.5" max="20" step="0.5"><span class="unit">倍市值</span></div>';
+    h+='<button class="btn btn-p sm" onclick="saveMaCfg(\''+maF.code+'\')">保存参数</button>';
+    h+='<div class="disc">改步长会同时改变档位边界和触发频率：步长 1% → 回测里 6.1 年触发 29 笔；'
+      +'步长缩到 0.5%，笔数大约翻倍、单笔金额减半（总弹药量级不变）。</div>';
+    h+='</div>';
+  }
+
+  /* 补仓流水 */
+  if(maF && maF.maPaid && maF.maPaid.log && maF.maPaid.log.length){
+    var lg=maF.maPaid.log, lgSum=0, lgi;
+    for(lgi=0;lgi<lg.length;lgi++) lgSum+=n(lg[lgi].amt);
+    h+='<div class="disc" style="margin-top:10px"><b>补仓流水</b>（共 '+lg.length+' 笔，合计 '+money(lgSum)+' 元）<br>';
+    lg.slice(-6).reverse().forEach(function(x){
+      h+='· '+esc(x.d)+'　补到 −'+n(x.k)+'% 档　'+money(x.amt)+' 元'
+        +'（当时偏离年线 '+fx(x.dev,2)+'%）<br>';
+    });
+    if(maF.maPaid.max>0){
+      h+='<br>本轮已补到 −'+(n(maF.maPaid.max)*mc.step)+'% 档。回到年线上方后，'
+        +'在「加仓雷达」页卡片上点「结束上一轮」把计数归零。</div>';
+    }
+  }
+
+  h+='<div class="disc" style="margin-top:10px"><b>为什么黄金和 A500 默认不在这个体系里？</b><br>'
+    +'把历史切成前后两段、复测「偏离年线 → 之后收益」：只有红利低波两段符号一致、关系稳定；'
+    +'黄金在 250 日前瞻下有 4 个档位方向翻转，A500 年线样本只有 203 天。'
+    +'所以这两只默认只展示年线位置、不给补仓金额，需要时用基金行里的「年线」按钮手动启用（会先提醒风险）。<br>'
+    +'完整回测数据（各档前瞻收益、事件次数、分段对照、单轮压力测试）见交付目录 README 的「二·五」节。</div></div>';
 
   h+='<div class="pn"><h2>💾 数据管理</h2>'
     +'<div class="tip">所有数据都存在本机浏览器，不上传服务器。换手机或清缓存前建议先导出备份。</div>'
@@ -1658,9 +1841,9 @@ function renderSet(){
     +'<b>区间收益</b>：自算（复权、按最新净值日回看自然日），与基金公司公布的区间收益因起算日不同可能略有差异<br>'
     +'<b>信号门槛</b>：评分 ≥60 可加仓，45~59 小额观察，32~44 观望，&lt;32 暂不加仓<br>'
     +'<b>止盈</b>：收益率 =（份额 × 最新净值 − 累计投入）÷ 累计投入<br>'
-    +'<b>「见鸡行事」</b>：看到评分信号才动手，不到 60 分不加仓<br>'
-    +'<b>年线档位</b>：250 日均线，用复权净值计算（未复权会被分红系统性压低）；'
-    +'仅对通过分段回测验证的品种参与金额决策</div></div>';
+    +'<b>「见鸡行事」</b>：金额 = 常规定投（周投基准 × 评分倍数）+ 年线补仓，两笔独立的钱<br>'
+    +'<b>年线补仓</b>：250 日均线，用复权净值计算（未复权会被分红系统性压低）；'
+    +'只有通过分段回测验证的品种才给补仓金额</div></div>';
 
   document.getElementById('view-set').innerHTML=h;
 }
@@ -1753,6 +1936,42 @@ function toggleMaMode(i){
   f.maMode = (f.maMode==='meanrev') ? 'off' : 'meanrev';
   saveFunds(); renderAll();
 }
+/* ── 年线补仓：按 code 定位基金（卡片按钮只带 code，不带下标，重绘后下标可能失效） ── */
+function fundByCode(code){
+  for(var i=0;i<funds.length;i++){ if(funds[i].code===code) return funds[i]; }
+  return null;
+}
+/** 标记「已补到当前档」，把档位计数推到 k，并留一条流水 */
+function maMarkPaid(code){
+  var f=fundByCode(code); if(!f) return;
+  var p=maPlan(f,dataMap[f.code]);
+  if(!p.due.length){ alert('当前没有待补的档位。'); return; }
+  var msg='确认已按这个方案补仓？\n\n'
+    +'补仓金额：'+money(p.amount)+' 元\n'
+    +'落档：−'+(p.k*p.cfg.step)+'% 档（本轮累计约 '+money(p.cum)+' 元）\n'
+    +'算法：持仓市值 '+money(p.M)+' × ('+p.due.join('+')+')/'+p.cfg.unit+'\n\n'
+    +'补完记得把新增份额填进「设置 → 我的基金 → 编辑」，否则持仓市值偏小、下次算出来的金额会偏低。';
+  if(!confirm(msg)) return;
+  if(!f.maPaid) f.maPaid={ max:0, log:[] };
+  if(!f.maPaid.log) f.maPaid.log=[];
+  f.maPaid.log.push({ d:today(), k:p.k, amt:Math.round(p.amount*100)/100, dev:+n(p.dev).toFixed(2) });
+  if(f.maPaid.log.length>300) f.maPaid.log=f.maPaid.log.slice(-300);
+  if(p.k>n(f.maPaid.max,0)) f.maPaid.max=p.k;
+  saveFunds(); renderAll();
+}
+/** 结束本轮：净值回到年线上方后把档位计数归零，流水保留 */
+function maResetCycle(code){
+  var f=fundByCode(code); if(!f) return;
+  var done=f.maPaid?n(f.maPaid.max,0):0;
+  if(!confirm('结束本轮补仓？\n\n'
+    +(done?('当前已补到 −'+done+'% 档。\n'):'')
+    +'净值回到年线上方即视为一轮结束，档位计数归零，下一轮从 −1% 重新开始。\n'
+    +'补仓流水会保留，只清空档位计数。')) return;
+  if(!f.maPaid) f.maPaid={ max:0, log:[] };
+  f.maPaid.max=0;
+  f.maPaid.cycleAt=today();
+  saveFunds(); renderAll();
+}
 function delFund(i){
   if(!confirm('确定删除「'+funds[i].name+'」？')) return;
   funds.splice(i,1); saveFunds(); renderAll();
@@ -1761,6 +1980,19 @@ function saveCfgForm(){
   cfg.holdCap=n(document.getElementById('c_holdCap').value,40);
   cfg.totalCap=n(document.getElementById('c_totalCap').value,75);
   saveCfg(); renderAll(); alert('已保存');
+}
+/** 保存年线补仓参数（步长 / 分母 / 上限），只作用于该只基金 */
+function saveMaCfg(code){
+  var f=fundByCode(code); if(!f) return;
+  var es=document.getElementById('ma_step'), eu=document.getElementById('ma_unit'), ec=document.getElementById('ma_cap');
+  if(!es||!eu||!ec) return;
+  var st=n(es.value,MA_CFG_DEF.step), un=n(eu.value,MA_CFG_DEF.unit), cp=n(ec.value,MA_CFG_DEF.cap);
+  if(!(st>0)) st=MA_CFG_DEF.step;
+  if(!(un>1)) un=MA_CFG_DEF.unit;
+  if(!(cp>=0)) cp=MA_CFG_DEF.cap;
+  f.maCfg={ step:st, unit:un, cap:cp };
+  saveFunds(); renderAll();
+  alert('参数已保存：每 '+st+'% 一档，每档补「持仓市值 ÷ '+un+'」的整数倍，本轮累计上限 '+cp+' 倍市值。');
 }
 function exportData(){
   var blob=new Blob([JSON.stringify({funds:funds,cfg:cfg,ts:new Date().toISOString()},null,2)],{type:'application/json'});
