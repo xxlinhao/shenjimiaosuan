@@ -315,6 +315,59 @@ footer{text-align:center;padding:16px 14px 6px;font-size:10px;color:var(--faint)
 .sect{font-size:12px;font-weight:800;color:var(--tx);margin:15px 2px 7px;display:flex;align-items:center;gap:6px}
 .sect .tag{font-size:9.5px;font-weight:700;color:var(--sub);background:var(--bg);border-radius:4px;padding:1px 6px}
 .sect .hint{margin-left:auto;font-size:9.5px;color:var(--faint);font-weight:600}
+/* 子块标题：属于某个一级章节内部，层级低一档 */
+.sectsub{font-size:11px;font-weight:800;color:var(--sub);margin:12px 2px 6px;
+  display:flex;align-items:center;gap:6px;padding-left:8px;border-left:2px solid var(--bd)}
+.sectsub .tag{font-size:9px;font-weight:700;color:var(--faint);background:var(--bg);border-radius:4px;padding:1px 5px}
+.sectsub .hint{margin-left:auto;font-size:9.5px;color:var(--faint);font-weight:600}
+
+/* ═══ 二级页顶部：四张判断卡（长期贵不贵 / 短期位置 / 资产质量 / 我的持仓） ═══
+   四张卡共同回答一个问题：「今天该不该加、加多少」，结论卡紧随其后。 */
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.qc{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--bd);
+  border-radius:11px;padding:9px 10px;min-width:0}
+.qc .hd{font-size:9.5px;font-weight:800;color:var(--sub);letter-spacing:.2px;
+  display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden}
+.qc .hd .no{color:var(--faint);font-weight:900;font-size:9px}
+.qc .lb{font-size:15px;font-weight:900;letter-spacing:-.3px;margin:5px 0 4px;
+  display:flex;align-items:center;gap:5px;line-height:1.2}
+.qc .lb .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.qc .r{font-size:9.5px;color:var(--sub);line-height:1.62;font-weight:600;
+  overflow-wrap:break-word}
+.qc .r b{font-weight:900;color:var(--tx);font-variant-numeric:tabular-nums}
+.qc .r.up{color:#c22}
+.qc .r dn{color:#0a7d45}
+.qc .r .g{color:#0a7d45;font-weight:900}
+.qc .r .rd{color:#c22;font-weight:900}
+
+/* 结论卡：四张卡的合成结果 */
+.vcard{border-radius:14px;padding:14px 15px;margin-bottom:11px;border:1.5px solid}
+.vcard.k-go{background:linear-gradient(135deg,#e9f9f0,#dff5e8);border-color:var(--go-bd)}
+.vcard.k-mid{background:linear-gradient(135deg,#fffaf0,#fff4dd);border-color:var(--wait-bd)}
+.vcard.k-stop{background:linear-gradient(135deg,#fdf0f0,#fbe6e6);border-color:var(--stop-bd)}
+.vcard.k-none{background:linear-gradient(135deg,#f7f8fa,#f1f3f7);border-color:var(--none-bd)}
+.vcard .t2{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--sub)}
+.vcard .m2{font-size:22px;font-weight:900;letter-spacing:-.6px;margin:4px 0 3px;line-height:1.2}
+.vcard.k-go .m2{color:#0a7d45}
+.vcard.k-mid .m2{color:#a86f00}
+.vcard.k-stop .m2{color:#c22}
+.vcard.k-none .m2{color:#5c6472}
+.vcard .s2{font-size:11px;color:#5f6875;font-weight:700}
+.vcard .why{margin-top:10px;padding-top:9px;border-top:1px dashed rgba(0,0,0,.12)}
+.vcard .why .wt{font-size:9.5px;font-weight:900;color:var(--sub);letter-spacing:.5px;margin-bottom:3px}
+.vcard .wi{font-size:10.5px;color:#5f6875;line-height:1.62;display:flex;gap:6px;margin-top:2px}
+.vcard .wi .b{flex-shrink:0;font-weight:900;color:#7a8494}
+.vcard .calc{margin-top:9px;font-size:9.5px;color:var(--faint);line-height:1.6;
+  background:rgba(255,255,255,.55);border-radius:8px;padding:7px 9px}
+
+/* 估值温度计：0°（最便宜）→ 100°（最贵） */
+.tm{margin-top:9px}
+.tm .bar{position:relative;height:10px;border-radius:5px;
+  background:linear-gradient(90deg,#2f80ed 0%,#3ba05e 28%,#c9c93a 52%,#dd8a2b 76%,#cf3b3b 100%)}
+.tm .mk{position:absolute;top:-3px;width:3px;height:16px;background:#2b3340;border-radius:2px;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.9)}
+.tm .ax{display:flex;justify-content:space-between;font-size:8.5px;color:var(--faint);
+  font-weight:700;margin-top:4px}
 
 /* ═══ 估值贵贱（用估值判断贵不贵，而不是价格位置） ═══ */
 .vbox{background:var(--card);border:1px solid var(--bd);border-radius:13px;padding:13px;margin-bottom:9px}
@@ -948,7 +1001,24 @@ function calcSignal(f){
   pool.sort(function(a,b){ return b.w-a.w; });
   r.reason=pool.slice(0,3);
 
-  var mult = r.score>=75?2 : (r.score>=60?1 : (r.score>=45?0.5 : 0));
+  var multBase = r.score>=75?2 : (r.score>=60?1 : (r.score>=45?0.5 : 0));
+  /* ── 长期估值给倍数设上限 ──────────────────────────────────────────
+     评分（短期位置）只回答「这周买便不便宜」，回答不了「整体贵不贵」。
+     红利低波就是典型：短期跌到布林下轨（评分说该买），但 PE 处在 5 年 83% 分位（估值说贵）。
+     两个问题各自成立，所以这里不合并成一个分数，而是让估值给倍数**压上限**：
+     短期再便宜，长期贵也不加倍。分位越高，允许的倍数越低。 */
+  var vv=valOf(f), vm=vv?valMain(vv):null, vpct=vm?vm.p.pct:null, vg=valLv(vpct);
+  var cap=2;
+  if(vg.lv!=null){ if(vg.lv>=5) cap=0.5; else if(vg.lv===4) cap=1; }
+  /* 持仓已经很重时不再加码 —— 仓位才是真正的风险敞口 */
+  var hd=assessHold(f, dataMap[f.code]);
+  var holdCut=(hd.lv!=null && hd.lv>=4)?0.5:1;
+  var mult = Math.min(multBase, cap) * holdCut;
+  r.detail.baseMult=multBase;
+  r.detail.cap=cap;
+  r.detail.vLv=vg.lv;
+  r.detail.vLb=vg.lb;
+  r.detail.holdCut=holdCut;
   /* ── 金额 = 常规定投 + 年线额外补仓（加法，不再相乘）──
      定投是「每周都要买的钱」，补仓是「跌破年线才掏的钱」，两者性质不同：
      混成一个倍数会让人误以为定投也跟着放大，也看不出补仓到底动了多少。
@@ -1674,10 +1744,19 @@ function maChart(d,s){
     +'<div><span class="k">偏离半年线</span><b class="'+(dev120==null?'':chgCls(dev120))+'">'+(dev120==null?'--':pct(dev120))+'</b></div>'
     +'</div>';
 
-  /* 年线补仓计划：直接回答「这一档该补多少钱」
-     只有通过分段检验的品种（当前仅红利低波）才给金额；
-     未验证的品种只显示位置，避免把别的品种的回测结论贴上去误导人。 */
+  h+='</div>';
+  return h;
+}
+
+/** 年线补仓计划（钱的部分）。
+    刻意从长线位置图里拆出来：图回答「位置在哪一档」，这里回答「该掏多少钱」，
+    而「掏多少钱」属于「我的持仓」，不属于「价格位置」。 */
+function maPlanBox(d,s){
+  var st=s&&s.detail?s.detail.ma:null;
   var plan=s&&s.detail?s.detail.plan:null;
+  var h='';
+  /* 只有通过分段检验的品种（当前仅红利低波）才给金额；
+     未验证的品种只显示位置，避免把别的品种的回测结论贴上去误导人。 */
   if(st&&plan&&plan.ok&&plan.dev!=null){
     var pstep=plan.cfg.step, punit=plan.cfg.unit, pcode=(d&&d.code)?d.code:'';
     if(plan.k>0){
@@ -1712,7 +1791,6 @@ function maChart(d,s){
       +'<span class="ev off">不参与金额</span>'
       +'<br><span class="ref">'+esc((plan&&plan.why)||st.why||'未启用')+'</span></div>';
   }
-  h+='</div>';
   return h;
 }
 
@@ -1956,34 +2034,43 @@ function valMain(v){
   var p5=v.pct['5y'];
   if(p5 && p5.n>=1000) return { p:p5, win:'近 5 年', full:true };
   var pa=v.pct.all;
-  return pa ? { p:pa, win:'成立以来（样本较短）', full:false } : null;
+  return pa ? { p:pa, win:'成立以来·样本短', full:false } : null;
 }
-function valSection(f){
+function secVal(f,d,s,no){
   var v=valOf(f);
+  var head=sect(no,'估值','','回答「长期贵不贵」');
   if(!v){
     if(NO_VAL.test(String(f.name||''))){
-      return '<div class="pn"><h2>💡 为什么这里没有估值</h2><div class="tip">'
+      return head+'<div class="pn"><h2>💡 为什么这里没有估值</h2><div class="tip">'
         +esc(shortName(f.name))+' 买的是商品本身，不产生盈利、也不分红，'
-        +'所以市盈率、市净率、股息率在数学上都不存在。它的「贵贱」只能用上面的长线位置'
+        +'所以市盈率、市净率、股息率在数学上都不存在。它的「贵贱」只能用价格位置'
         +'（净值相对年线、相对区间的位置）来衡量——这是资产属性决定的，不是数据缺失。</div></div>';
     }
-    return '<div class="pn"><h2>💡 估值数据未就绪</h2><div class="tip">'
+    return head+'<div class="pn"><h2>💡 估值数据未就绪</h2><div class="tip">'
       +(VALDATA ? '这只基金暂未匹配到跟踪指数的估值。可在设置页给它指定指数代码（如 H30269、000510）。'
                 : '估值文件 valuation.js 未加载（文件缺失或没跟页面一起上传）。')
       +'</div></div>';
   }
   var main=valMain(v), g=valGradeOf(main?main.p.pct:null);
-  var h='<div class="vbox">';
+  var h=head+'<div class="vbox">';
 
   /* 主行：当前 PE + 结论徽章 */
   h+='<div class="vtop"><span class="big" style="color:'+g.tone+'">'+fx(v.pe,2)+'</span>'
     +'<span class="u">倍 PE · '+esc(v.short)+'</span>'
     +'<span class="lbl" style="background:'+g.tone+'1f;color:'+g.tone+'">'+g.lb+'</span></div>';
 
-  /* 分位条：黑标尺=当前 PE 所处位置 */
-  var pin=main?Math.max(1.5,Math.min(98.5,main.p.pct)):50;
-  h+='<div class="vbar"><div class="mk" style="left:'+pin.toFixed(1)+'%"></div></div>'
-    +'<div class="vaxis"><span>0% 最便宜</span><span>50%</span><span>100% 最贵</span></div>';
+  /* 估值温度：直接用主口径的 PE 分位当度数（0°最便宜 / 100°最贵），不做二次加工，
+     这样页面上标的「温度」和下面的「分位」是同一个数，能自己对上。 */
+  var tp=tempOf(v);
+  if(tp){
+    h+='<div class="tm"><div class="bar"><div class="mk" style="left:'
+      +Math.max(1,Math.min(99,tp.deg)).toFixed(1)+'%"></div></div>'
+      +'<div class="ax"><span>0° 最便宜</span><span>估值温度 '+tp.deg+'°（'+esc(tp.win)+' PE 分位）</span>'
+      +'<span>100° 最贵</span></div></div>';
+  }
+
+  /* 这里原本还画一条 0–100 的分位标尺，但温度计的度数就是分位本身，
+     两条渐变条叠在一起是重复信息、反而看不清，所以只保留温度计。 */
 
   if(main){
     h+='<div class="kvrow" style="margin-top:9px"><span class="k">当前 PE 历史位置（'+main.win+'）</span>'
@@ -2010,18 +2097,34 @@ function valSection(f){
       +'分位的参考价值有限——再等几轮涨跌，百分位才说得上话。</div>';
   }
 
-  /* 股息率：对红利类资产比 PE 更直接 */
-  if(v.dy!=null){
-    var rf=n(cfg.rf,RF_DEF), prem=v.dy-rf;
-    var pt=prem>=3?'#0f9d63':(prem>=2?'#3ba05e':(prem>=1?'#8a8f45':'#dd8a2b'));
+  /* PB 分位：与 PE 互为校验。
+     PE 的分母是盈利，盈利一次性下滑会让 PE 被动变贵 —— 这时 PB 更可信。
+     两个分位差得多，本身就是一条信息，必须显式提示，而不是挑一个顺眼的展示。 */
+  if(v.pb!=null){
+    var pbg=(v.pbPct==null)?null:valLv(v.pbPct);
     h+='<div class="vgrid" style="margin-top:6px">'
-      +'<div class="vg"><div class="k">股息率</div><div class="v">'+fx(v.dy,2)+'%</div>'
-      +'<div class="s">每年分红 ÷ 当前价格</div></div>'
-      +'<div class="vg"><div class="k">股息率 − 无风险利率</div>'
-      +'<div class="v" style="color:'+pt+'">'+(prem>=0?'+':'')+fx(prem,2)+'%</div>'
-      +'<div class="s">对比 '+fx(rf,2)+'% 的国债</div></div></div>';
-    h+='<div class="kvrow" style="margin-top:6px"><span class="k">股息是国债的几倍</span>'
-      +'<span class="v">'+fx(v.dy/Math.max(rf,0.01),2)+' 倍</span></div>';
+      +'<div class="vg"><div class="k">PB 市净率</div><div class="v">'+fx(v.pb,2)+'</div>'
+      +'<div class="s">价格 ÷ 每股净资产</div></div>'
+      +'<div class="vg"><div class="k">PB 历史分位</div>'
+      +'<div class="v" style="color:'+(pbg?pbg.tone:'#8a93a3')+'">'
+      +(v.pbPct==null?'无数据':fx(v.pbPct,1)+'%')
+      +(pbg?'<span style="font-size:9.5px;font-weight:800;margin-left:4px">'+pbg.lb+'</span>':'')+'</div>'
+      +'<div class="s">'+(v.pbPct==null?'该指数未被蛋卷收录':'分位越低越便宜')+'</div></div></div>';
+    if(tp&&tp.gap!=null&&tp.gap>=25){
+      h+='<div class="disc" style="margin-top:6px">⚠ PE 分位（'+fx(tp.pct,1)+'%）与 PB 分位（'+fx(v.pbPct,1)
+        +'%）相差 '+fx(tp.gap,0)+' 个百分点，两把尺子读数不一致。'
+        +'常见原因是盈利端出现一次性变化（减值、分红或行业景气反转），这时 PB 更能反映真实价格位置。</div>';
+    }
+  }else{
+    /* 中证A500 就属于这种：中证官网的接口只给 PE，蛋卷收录的 63 个指数里没有它，
+       所以 PB 分位两个源都拿不到。如实说明，绝不拿相近指数（比如沪深300）的 PB 顶上。 */
+    h+='<div class="vgrid" style="margin-top:6px">'
+      +'<div class="vg"><div class="k">PB 历史分位</div>'
+      +'<div class="v" style="color:#aab2c0">无数据源</div>'
+      +'<div class="s">中证官网只提供 PE</div></div>'
+      +'<div class="vg"><div class="k">为什么不用别的指数顶替</div>'
+      +'<div class="v" style="font-size:11.5px;font-weight:800;color:var(--sub)">口径会错</div>'
+      +'<div class="s">宁可缺一个数，不给错一个数</div></div></div>';
   }
 
   /* PE 走势迷你图 */
@@ -2041,197 +2144,627 @@ function valSection(f){
   }
 
   h+='<div class="disc">PE 为指数市盈率（中证指数官网，数据截至 '+esc(v.last||'--')+'）；'
-    +'分位 = 当前 PE 高于该窗口内多少比例交易日的 PE，分位越低越便宜。'
-    +(v.pb!=null?('PB '+fx(v.pb,2)+'。'):'')
-    +'股息率与官方百分位来自蛋卷基金。'
-    +'<br><b>注意这是另一把尺子</b>：本节看「价格相对盈利与分红」，'
-    +'上面的长线位置看「价格相对自身历史」。长期上涨的品种价格创新高是常态，'
+    +'分位 = 当前 PE 高于该窗口内多少比例交易日的 PE，越低越便宜。'
+    +(v.pbPct!=null?('PB 市净率与 PB 分位来自蛋卷基金。'):'')
+    +'<br><b>注意这是另一把尺子</b>：本节看「价格相对盈利与净资产」，'
+    +'价格位置那节看「价格相对自身历史」。长期上涨的品种价格创新高是常态，'
     +'所以位置指标会一直显示「贵」——中证红利指数点位从 3582 涨到 5528（+54%），'
-    +'同期 PE 反而从 10.01 降到 8.51。判断贵贱，请以本节为准。</div>';
+    +'同期 PE 反而从 10.01 降到 8.51。判断贵贱，以本节为准。</div>';
   h+='</div>';
   return h;
 }
 
-function renderFund(){
-  var el=document.getElementById('view-fund');
-  if(!el) return;
-  if(!fundPage){ el.innerHTML=''; return; }
-  var f=fundByCode(fundPage);
-  if(!f){ el.innerHTML='<div class="empty">基金不存在</div>'; return; }
-  var d=dataMap[f.code];
-  var s=calcSignal(f);
-  var m=d&&d.metrics?d.metrics:null;
-  var navNow=(d&&d.nav)?n(d.nav):null;
-
-  var h='';
-  /* 返回栏 */
-  h+='<button class="back" onclick="closeFund()">'
-    +'<span class="bic">‹</span><span class="btx">返回仪表盘总览</span>'
-    +'<span class="bsub">当前：'+esc(shortName(f.name))+'</span></button>';
-
-  /* 头卡 */
-  h+='<div class="fhead"><div class="t">'+esc(f.name)+'</div>'
-    +'<div class="c"><span>'+f.code+'</span>'
-    +(f.cat?'<span class="pill">'+esc(f.cat)+'</span>':'')
-    +(f.etf?'<span class="pill">场内 '+f.etf+'</span>':'')
-    +(f.tp>0?'<span class="pill">止盈 '+f.tp+'%</span>':'<span class="pill">无止盈</span>')
-    +'</div>'
-    +'<div class="navrow"><span class="big num">'+(navNow?navNow.toFixed(4):'--')+'</span>'
-    +'<span class="ch num '+chgCls(d?n(d.navChg):null)+'">'+((d&&d.navChg!=null)?pct(d.navChg):'--')+'</span>'
-    +'<span class="dt">净值日期 '+(d&&d.navDate?d.navDate:'--')
-    +(d&&d.live?('<br>场内 '+esc(d.live.sym)+' '+d.live.price.toFixed(3)+' <b class="'+chgCls(d.live.chg)+'">'+pct(d.live.chg)+'</b>'):'')
-    +'</span></div></div>';
-
-  if(!d||!d.ok){
-    h+='<div class="empty">该基金数据未取到'
-      +((d&&d.errors&&d.errors.length)?('<br>'+esc(d.errors.join('；'))):'')
-      +'<br>请点右上角「刷新」重试</div>';
-    el.innerHTML=h; return;
+/* ── 股息：红利类资产最硬的锚（第 5 项） ── */
+function secDiv(f,d,s,no){
+  var v=valOf(f);
+  var h=sect(no,'股息','','分红是拿得到的现金回报');
+  if(!v||v.dy==null){
+    var na=!v;
+    return h+'<div class="pn"><div class="tip">'
+      +(na ? (NO_VAL.test(String(f.name||''))
+              ? '这类资产不产生分红，没有股息率。'
+              : '估值数据未加载，暂时算不出股息率。')
+            : '该指数的跟踪方（蛋卷）没有提供股息率数据，可能是它未被收录。')
+      +'</div></div>';
   }
+  var rf=n(cfg.rf,RF_DEF), prem=v.dy-rf;
+  var pt=prem>=3?'#0f9d63':(prem>=2?'#3ba05e':(prem>=1?'#8a8f45':'#dd8a2b'));
+  h+='<div class="vbox"><div class="vgrid">'
+    +'<div class="vg"><div class="k">股息率</div><div class="v">'+fx(v.dy,2)+'%</div>'
+    +'<div class="s">每年分红 ÷ 当前价格</div></div>'
+    +'<div class="vg"><div class="k">股息率 − 无风险利率</div>'
+    +'<div class="v" style="color:'+pt+'">'+(prem>=0?'+':'')+fx(prem,2)+'%</div>'
+    +'<div class="s">对比 '+fx(rf,2)+'% 的国债</div></div></div>'
+    +'<div class="kvrow" style="margin-top:6px"><span class="k">股息是国债的几倍</span>'
+    +'<span class="v">'+fx(v.dy/Math.max(rf,0.01),2)+' 倍</span></div>';
+  h+='<div class="disc" style="margin-top:8px">'
+    +'股息率是<b>价格相对分红</b>的尺子，和 PE 看的角度不同：'
+    +'PE 高可能只是盈利暂时下滑，只要分红照发，股息率就还在替你收钱。'
+    +'这个溢价（股息率 − 国债）越厚，下跌时越有人接盘，是红利类资产的「底」。'
+    +(prem>=2?('<br>当前溢价 '+fx(prem,2)+'%，属于历史上比较厚的位置。'):'')
+    +(prem<0?('<br>当前溢价为负，说明拿这只收息已经不如直接买国债，性价比在变差。'):'')
+    +'</div></div>';
+  return h;
+}
 
-  /* ── ① 今日建议总结 ── */
-  h+='<div class="sect">① 今日建议总结<span class="hint">评分 '+s.score+' · '+s.label+'</span></div>';
-  var exAmt=n(s.detail.amountExtra), bsAmt=n(s.detail.amountBase);
-  var vCls=s.level==='stop'?'v-wait':(s.detail.amount>0?'v-go':(s.level==='wait'?'v-wait':'v-none'));
-  h+='<div class="verdict '+vCls+'">'
-    +'<div class="vtag">本周见鸡行事</div>'
-    +'<div class="vmain">'+(s.detail.amount>0?('加 '+money(s.detail.amount).replace(/\.00$/,'')+' 元'):'暂不投入')+'</div>'
-    +'<div class="vsub">'+esc(s.act)+'</div>'
-    +'<div class="vamt"><span>常规定投（周投 '+money(s.detail.week)+' × '+(s.detail.mult||0)+' 倍）</span>'
-    +'<b class="num" style="color:#3c4453;font-size:15px">'+money(bsAmt)+'</b></div>'
-    +(exAmt>0?('<div class="vamt"><span>年线额外补仓</span><b class="num">'+money(exAmt)+'</b></div>'):'')
-    +'</div>';
-
-  if(s.detail.retPct!=null && n(f.shares)>0){
-    h+='<div class="kvrow" style="margin:-4px 2px 8px"><span class="k">你的持仓</span><span class="v">'
-      +n(f.shares).toFixed(2)+' 份 · 市值 '+money(mvOf(f,d))
-      +' · 收益 <b class="'+chgCls(s.detail.retPct)+'">'+pct(s.detail.retPct)+'</b></span></div>';
+/* ── 盈利：A500 这类宽基更该看盈利，而不是分红（第 2 项） ── */
+function secEarn(f,d,s,no){
+  var v=valOf(f);
+  var h=sect(no,'盈利','','点位 ÷ PE，可自算可复核');
+  if(!v||!v.earn||(v.earn.yoy1y==null&&v.earn.cagr==null)){
+    return h+'<div class="pn"><div class="tip">'
+      +(v?('该指数可用于计算盈利的样本不足（'+v.days+' 个交易日），算不出同比。')
+         :'估值数据未加载。')+'</div></div>';
   }
-
-  /* 判断依据（原仪表盘上的理由列表，移到二级页） */
-  if(s.reason&&s.reason.length){
-    h+='<div class="pn"><h2>🧮 判断依据</h2><div class="reasons" style="margin-bottom:0">';
-    s.reason.forEach(function(r){
-      h+='<div class="rs '+(r.ok===false?'neg':'pos')+'"><span class="mk">'+(r.ok===false?'✗':'✓')+'</span><span>'+r.t+'</span></div>';
-    });
-    h+='</div></div>';
-  }
-
-  /* ── ② 长线位置（年线 + 半年线） ── */
-  h+='<div class="sect">② 长线位置<span class="tag">250 日年线 · 120 日半年线</span>'
-    +'<span class="hint">定长期值不值得花钱</span></div>';
-  var ch=maChart(d,s);
-  if(ch) h+=ch;
-  else h+='<div class="empty">'+(d.histAll
-    ?('净值样本不足 '+(MA_WIN+30)+' 个交易日，暂画不出长线位置图')
-    :('完整净值序列更新中…数据到位后自动显示'))+'</div>';
-
-  /* ── ③ 估值贵贱（回答「现在贵不贵」） ── */
-  var vv=valOf(f), vm=vv?valMain(vv):null, vg=vm?valGradeOf(vm.p.pct):null;
-  h+='<div class="sect">③ 估值贵贱'
-    +'<span class="tag">'+(vv?('PE '+fx(vv.pe,2)+' · '+esc(vv.short)):'无估值维度')+'</span>'
-    +'<span class="hint">'+(vg?('当前 '+vg.lb):'看盈利与分红，不看价格')+'</span></div>';
-  h+=valSection(f);
-
-  /* ── ④ 布林带 ── */
-  h+='<div class="sect">④ 布林带<span class="tag">20 日 · 2 倍标准差</span>'
-    +'<span class="hint">看这周买划不划算</span></div>';
-  if(m&&m.boll){
-    var b=m.boll, pinPct=Math.max(2,Math.min(98,s.detail.pctB==null?50:s.detail.pctB));
-    h+='<div class="boll-box"><div class="boll-head"><span>价格在通道里的位置（近 20 日）</span>'
-      +'<span class="num">'+fx(b.lower,4)+' ｜ '+fx(b.mid,4)+' ｜ '+fx(b.upper,4)+'</span></div>'
-      +'<div class="boll-track"><div class="boll-band"></div>'
-      +'<div class="boll-mid" style="left:50%"></div>'
-      +'<div class="boll-pin" style="left:'+pinPct+'%"></div>'
-      +'<div class="boll-pin-lb" style="left:'+pinPct+'%">'+fx(navNow,4)+'</div>'
-      +'</div><div class="boll-axis"><span>便宜（下轨）</span><span>中轨</span><span>偏贵（上轨）</span></div></div>';
-    if(navNow){
-      var gap=(navNow/b.lower-1)*100, tip;
-      if(gap<=0) tip='已跌破布林下轨，属于超卖区，是较好的分批买入区间。';
-      else if(gap<=1.5) tip='距下轨仅 '+gap.toFixed(2)+'%，已经很接近超卖区，可以开始小额分批。';
-      else if(gap<=5) tip='距下轨还有 '+gap.toFixed(2)+'%，未到理想买点，可等到跌近下轨再动手。';
-      else tip='距下轨还有 '+gap.toFixed(2)+'%，位置偏高，建议耐心等待回落。';
-      h+='<div class="buyline">'
-        +'<div class="r"><span class="k">当前净值</span><span class="v num">'+fx(navNow,4)+'</span></div>'
-        +'<div class="r"><span class="k">布林下轨（超卖触发）</span><span class="v num" style="color:#0a7d45">'+fx(b.lower,4)+'</span></div>'
-        +'<div class="r"><span class="k">布林中轨（20 日均线）</span><span class="v num">'+fx(b.mid,4)+'</span></div>'
-        +'<div class="r"><span class="k">布林上轨（偏高）</span><span class="v num" style="color:#c22">'+fx(b.upper,4)+'</span></div>'
-        +'<div class="r"><span class="k">通道宽度（波动收敛/扩张）</span><span class="v num">'+fx(b.width,2)+'%</span></div>'
-        +'<div class="hint">'+tip+'</div></div>';
+  var e=v.earn;
+  h+='<div class="vbox">';
+  if(e.yoy1y!=null){
+    var eg=e.yoy1y>=0?'#c22':'#0a7d45';
+    h+='<div class="vtop"><span class="big" style="color:'+eg+'">'+(e.yoy1y>=0?'+':'')+fx(e.yoy1y,2)+'%</span>'
+      +'<span class="u">隐含盈利 · 近 1 年</span></div>';
+    h+='<div class="vgrid" style="margin-top:6px">'
+      +'<div class="vg"><div class="k">同期点位涨跌</div>'
+      +'<div class="v '+(e.pxYoy>=0?'up':'dn')+'">'+(e.pxYoy==null?'--':(e.pxYoy>=0?'+':'')+fx(e.pxYoy,2)+'%')+'</div>'
+      +'<div class="s">指数本身涨了多少</div></div>'
+      +'<div class="vg"><div class="k">同期 PE 变化</div>'
+      +'<div class="v" style="color:'+(e.peYoy>=0?'#dd8a2b':'#3ba05e')+'">'+(e.peYoy==null?'--':(e.peYoy>=0?'+':'')+fx(e.peYoy,2)+'%')+'</div>'
+      +'<div class="s">估值扩张还是收缩</div></div></div>';
+    /* 把「点位 = PE × 盈利」这个恒等式摊开，让用户自己能验算 */
+    var verdictTxt;
+    if(e.pxYoy!=null&&e.peYoy!=null){
+      if(e.yoy1y>0&&e.peYoy<0) verdictTxt='价格在涨、估值反而在降 —— 这波上涨由<b>盈利推动</b>，是健康的结构。';
+      else if(e.yoy1y<0&&e.peYoy>0) verdictTxt='价格没跌多少，但盈利在缩水，PE 是被<b>被动抬起来</b>的。这种「贵」不是买的人变多，而是赚的钱变少。';
+      else if(e.yoy1y>0) verdictTxt='盈利与估值同向扩张，涨得不便宜，需要盈利继续兑现才撑得住。';
+      else verdictTxt='盈利与估值同时回落，属于典型的杀业绩阶段。';
     }
-  }else{
-    h+='<div class="empty">净值样本不足 20 个交易日，算不出布林带</div>';
+    h+='<div class="disc" style="margin-top:8px">'
+      +'点位 = 市盈率 × 盈利，所以价格的变化一定能拆成这两块：'
+      +'近一年点位 '+(e.pxYoy>=0?'+':'')+fx(e.pxYoy,1)+'%，'
+      +'其中估值贡献 '+(e.peYoy>=0?'+':'')+fx(e.peYoy,1)+'%，盈利贡献 '+(e.yoy1y>=0?'+':'')+fx(e.yoy1y,1)+'%。<br>'
+      +verdictTxt
+      +'<br><span style="color:var(--faint)">口径：隐含盈利 = 指数点位 ÷ 当日 PE，'
+      +'样本 '+e.span+' 个交易日，同比取约 250 个交易日前对比（时间差超过 60 天就不算，不硬凑）。</span></div>';
   }
+  if(e.cagr!=null){
+    h+='<div class="kvrow" style="margin-top:6px"><span class="k">全区间盈利年化</span>'
+      +'<span class="v '+(e.cagr>=0?'':'dn')+'">'+(e.cagr>=0?'+':'')+fx(e.cagr,2)+'%</span></div>';
+  }
+  if(v.roe!=null){
+    h+='<div class="kvrow"><span class="k">ROE（净资产收益率）</span><span class="v">'+fx(v.roe,2)+'%</span></div>';
+  }else{
+    h+='<div class="kvrow"><span class="k">ROE</span><span class="v" style="color:var(--faint)">该指数未被蛋卷收录，无数据</span></div>';
+  }
+  h+='</div>';
+  return h;
+}
 
-  /* ── ⑤ 其他技术指标 ── */
-  h+='<div class="sect">⑤ 其他技术指标<span class="hint">全部按分红再投复权净值计算</span></div>';
-  if(m){
-    h+='<div class="pn">';
-    h+='<div class="sub2">均线偏离（负数=在均线下方）</div><div class="kvs">';
-    [5,10,20,60,120,250].forEach(function(w){
-      var x=m.ma[w];
-      h+='<div class="kv"><span class="k">距 '+w+' 日线</span><span class="v '+chgCls(x?x.dev:null)+'">'+(x?pct(x.dev):'--')+'</span></div>';
+/* ══════════════════════════════════════════════════════════════════════
+   决策链：四张判断卡 → 一条结论
+   ─────────────────────────────────────────────────────────────────────
+   「这只基金现在能不能买」其实是两个问题：
+     · 贵不贵（长期估值 + 短期位置）——价格相对盈利、相对分红、相对自身历史
+     · 该不该买（资产质量 + 我的持仓）——赚不赚钱、我手里多重
+   四者合成一条建议。金额只在 calcSignal 里算一次（单一真源），
+   这里负责把「为什么是这个金额」讲清楚；两处各算一遍必然打架。
+
+   三只基金的主线不同，所以章节顺序按品种走：
+     红利低波：估值 → 股息 → 价格位置 → 回撤 → 我的持仓
+     A500：    估值 → 盈利 → 市场位置 → 风险 → 我的持仓
+     黄金：    价格 → 趋势 → 回撤 → 宏观环境 → 我的持仓
+   ══════════════════════════════════════════════════════════════════════ */
+var FLOW_RED  = ['估值','股息','价格位置','回撤','我的持仓','规模与配置'];
+var FLOW_WIDE = ['估值','盈利','市场位置','风险','我的持仓','规模与配置'];
+var FLOW_GOLD = ['价格','趋势','回撤','宏观环境','我的持仓','规模与配置'];
+
+function fundKind(f){
+  var nm=String((f&&f.name)||'');
+  if(NO_VAL.test(nm)) return 'gold';
+  if(/红利|低波|价值|股息|银行|消费|医药/.test(nm)) return 'red';
+  return 'wide';
+}
+function flowOf(f){
+  var k=fundKind(f);
+  return k==='gold'?FLOW_GOLD:(k==='red'?FLOW_RED:FLOW_WIDE);
+}
+
+/* 时间分位：今天的价格高于历史上多少比例的交易日的价格。
+   ⚠ 别和 posOf() 混 —— posOf 算的是「在区间最高最低之间处于什么位置」，
+   两者对长期上涨的品种会得出很不一样的数，用途也完全不同。 */
+function timePctOf(v){
+  if(!v||v.length<60) return null;
+  var cur=v[v.length-1], below=0, i;
+  for(i=0;i<v.length;i++){ if(v[i]<cur) below++; }
+  return below/v.length*100;
+}
+
+/* ── 档位映射：分越低越便宜／越低越该买 ── */
+function valLv(p){
+  if(p==null||!isFinite(p)) return { lv:null, lb:'--', tone:'#aab2c0', dot:'#c8ced8' };
+  if(p<20) return { lv:1, lb:'很便宜', tone:'#0f9d63', dot:'#0f9d63' };
+  if(p<40) return { lv:2, lb:'便宜',   tone:'#3ba05e', dot:'#3ba05e' };
+  if(p<60) return { lv:3, lb:'合理',   tone:'#8a8f45', dot:'#c9c93a' };
+  if(p<80) return { lv:4, lb:'偏贵',   tone:'#dd8a2b', dot:'#dd8a2b' };
+  return { lv:5, lb:'贵', tone:'#cf3b3b', dot:'#cf3b3b' };
+}
+function shortLv(sc){
+  if(sc==null) return { lv:null, lb:'--', tone:'#aab2c0', dot:'#c8ced8' };
+  if(sc>=75) return { lv:1, lb:'很低位', tone:'#0f9d63', dot:'#0f9d63' };
+  if(sc>=60) return { lv:2, lb:'偏低',   tone:'#3ba05e', dot:'#3ba05e' };
+  if(sc>=45) return { lv:3, lb:'正常',   tone:'#8a8f45', dot:'#c9c93a' };
+  if(sc>=32) return { lv:4, lb:'偏高',   tone:'#dd8a2b', dot:'#dd8a2b' };
+  return { lv:5, lb:'高位', tone:'#cf3b3b', dot:'#cf3b3b' };
+}
+/* 持仓轻重：用「持仓市值 ÷ 一年计划投入」衡量，而不是占组合比例。
+   理由：现在总共才三只基金、金额都小，占比高只说明别的买得少，
+   不代表这只买多了。用「已积累了几个月的定投量」更贴近真实敞口。 */
+function holdLv(r){
+  if(r==null||!isFinite(r)) return { lv:null, lb:'--', tone:'#aab2c0', dot:'#c8ced8' };
+  if(r<0.3) return { lv:1, lb:'很轻', tone:'#3ba05e', dot:'#d9c62e' };
+  if(r<0.8) return { lv:2, lb:'偏轻', tone:'#3ba05e', dot:'#3ba05e' };
+  if(r<1.5) return { lv:3, lb:'正常', tone:'#8a8f45', dot:'#c9c93a' };
+  if(r<3)   return { lv:4, lb:'偏重', tone:'#dd8a2b', dot:'#dd8a2b' };
+  return { lv:5, lb:'很重', tone:'#cf3b3b', dot:'#cf3b3b' };
+}
+
+/* ── ① 长期贵不贵 ── */
+function assessLongVal(f,d){
+  var nm=String((f&&f.name)||'');
+  var v=valOf(f);
+  if(!v){
+    if(NO_VAL.test(nm)){
+      /* 商品没有 PE 可用，但「贵不贵」这个问题还是要回答 ——
+         改用「成立以来价格时间分位」，并明确标注这是另一把尺子。 */
+      var hv=d&&d.histAll, pa=timePctOf(hv);
+      var rowsN=[];
+      if(pa!=null){
+        rowsN.push(['价格时间分位', fx(pa,0)+'%（史上比今天更低的时间）']);
+        rowsN.push(['替代尺子','商品无 PE，只能用价格']);
+      }else{
+        rowsN.push(['原因','不生息、不分红，无 PE/PB']);
+      }
+      /* 用价格的尺子替估值回答问题。注意 lv 留空：
+         价格分位不参与「加仓倍数上限」，那条规则只认真正的估值口径。 */
+      var gN = pa==null ? { lb:'无估值维度', tone:'#aab2c0', dot:'#c8ced8' }
+             : pa>=85 ? { lb:'价格很高', tone:'#cf3b3b', dot:'#cf3b3b' }
+             : pa>=65 ? { lb:'价格偏高', tone:'#dd8a2b', dot:'#dd8a2b' }
+             : pa>=35 ? { lb:'价格中性', tone:'#8a8f45', dot:'#c9c93a' }
+             : pa>=15 ? { lb:'价格偏低', tone:'#3ba05e', dot:'#3ba05e' }
+             :          { lb:'价格很低', tone:'#0f9d63', dot:'#0f9d63' };
+      return { lb:gN.lb, tone:gN.tone, dot:gN.dot, lv:null, kind:'px', pct:pa, rows:rowsN };
+    }
+    return { lb:'数据未就绪', tone:'#aab2c0', dot:'#c8ced8', lv:null, kind:'none',
+      rows:[['状态', VALDATA?'未匹配到跟踪指数':'valuation.js 未加载']] };
+  }
+  var main=valMain(v), p=main?main.p.pct:null, g=valLv(p);
+  var rows=[];
+  rows.push(['PE '+fx(v.pe,2),(main?('分位 '+fx(p,1)+'%（'+main.win+'）'):'分位 —')]);
+  if(v.pbPct!=null) rows.push(['PB '+fx(v.pb,2),'分位 '+fx(v.pbPct,1)+'%']);
+  else rows.push(['PB','该指数无历史分位数据']);
+  return { lb:g.lb, tone:g.tone, dot:g.dot, lv:g.lv, kind:'val',
+           pct:p, win:main?main.win:'', v:v, rows:rows };
+}
+
+/* ── ② 短期位置 ── */
+function assessShortPos(f,d,s){
+  var g=shortLv(s?s.score:null);
+  var m=d&&d.metrics?d.metrics:null;
+  var rows=[], p20=m&&m.pos?m.pos.p20:null;
+  var b=m?m.boll:null, nav=d?n(d.nav):null;
+  /* 档位来自综合评分，就把评分亮出来 —— 否则「正常」两个字没有依据可查 */
+  if(s) rows.push(['买点评分', s.score+' 分']);
+  if(p20!=null) rows.push(['20 日分位', fx(p20,0)+'%']);
+  if(b&&nav&&b.lower>0) rows.push(['距布林下轨', (((nav/b.lower-1)*100)<=0?'已跌破':'+'+fx((nav/b.lower-1)*100,2)+'%')]);
+  else if(s&&s.detail&&s.detail.dev250!=null) rows.push(['距年线', pct(s.detail.dev250)]);
+  return { lb:g.lb, tone:g.tone, dot:g.dot, lv:g.lv, kind:'pos', score:s?s.score:null, rows:rows,
+           p20:p20, boll:b, nav:nav, dev250:s&&s.detail?s.detail.dev250:null };
+}
+
+/* ── ③ 资产质量（会不会赚钱、有没有现金流） ── */
+function assessQuality(f,d){
+  var kind=fundKind(f), v=valOf(f);
+  if(kind==='gold'){
+    /* 商品没有「盈利质量」可言，但这张卡不能空着 ——
+       改用它能提供的真实价值：与股市的联动性（能不能替组合分散风险）。 */
+    var rowsG=[['属性','不生息、不分红']];
+    var cg=corrWithBench(d);
+    rowsG.push(['与'+BENCH_NAME+'相关性', cg?fx(cg.r,2):'暂不可得']);
+    return { lb:'无盈利属性', tone:'#aab2c0', dot:'#c8ced8', lv:null, kind:'na', na:true,
+      rows:rowsG,
+      why:'黄金不产生盈利、也不分红，用质量指标衡量它没有意义；它对组合的价值在于和股票涨跌的联动性。' };
+  }
+  var pts=0, rows=[], why=[];
+  var rf=n(cfg.rf,RF_DEF);
+  /* 分红能力：股息率相对国债的溢价 —— 有现金流才有「底」 */
+  if(v&&v.dy!=null){
+    var prem=v.dy-rf;
+    rows.push(['股息率', fx(v.dy,2)+'%']);
+    rows.push(['股息−国债', (prem>=0?'+':'')+fx(prem,2)+'%']);
+    if(prem>=2.5){ pts+=2; why.push('股息率是国债的 '+fx(v.dy/Math.max(rf,0.01),2)+' 倍，现金流回报扎实'); }
+    else if(prem>=1.5){ pts+=1; why.push('股息率明显高于国债，分红有吸引力'); }
+    else if(prem>=0){ why.push('股息率略高于国债，分红一般'); }
+    else { pts-=2; why.push('股息率已低于国债，拿分红还不如拿国债'); }
+  }else if(v){
+    rows.push(['股息率','该指数无数据']);
+  }
+  /* 盈利质量：隐含盈利同比（点位÷PE 的变化）—— 分红是果，盈利是因 */
+  if(v&&v.earn&&v.earn.yoy1y!=null){
+    var ey=v.earn.yoy1y;
+    rows.push(['隐含盈利同比', (ey>=0?'+':'')+fx(ey,2)+'%']);
+    if(ey>=5){ pts+=2; why.push('过去一年盈利增长 '+fx(ey,1)+'%，基本面在改善'); }
+    else if(ey>=0){ pts+=1; why.push('盈利小幅增长，基本面平稳'); }
+    else if(ey>=-10){ why.push('盈利同比 '+fx(ey,1)+'%，基本面上略有退坡，PE 的抬升有一部分是被动抬起来的'); }
+    else { pts-=2; why.push('盈利同比 '+fx(ey,1)+'%，缩水明显，估值便宜可能是「便宜有便宜的道理」'); }
+  }
+  if(v&&v.roe!=null){
+    rows.push(['ROE', fx(v.roe,2)+'%']);
+    if(v.roe>=12) pts+=1;
+    else if(v.roe<8) pts-=1;
+  }
+  var g = pts>=3 ? { lb:'好', tone:'#0f9d63', dot:'#0f9d63', lv:1 }
+        : pts>=0 ? { lb:'正常', tone:'#3ba05e', dot:'#3ba05e', lv:0 }
+        :          { lb:'有瑕疵', tone:'#dd8a2b', dot:'#dd8a2b', lv:2 };
+  if(!why.length) why.push('可得的基本面指标没有明显异常');
+  return { lb:g.lb, tone:g.tone, dot:g.dot, lv:g.lv, kind:'qual', rows:rows, why:why.join('；')+'。' };
+}
+
+/* ── ④ 我的持仓 ── */
+function assessHold(f,d){
+  var mv=mvOf(f,d), wk=n(f.week), yr=wk*52;
+  var totalMV=0;
+  funds.forEach(function(x){
+    var v=mvOf(x, dataMap[x.code]);
+    if(v!=null) totalMV+=v;
+  });
+  var ratio = (yr>0 && mv!=null) ? mv/yr : null;
+  var g = holdLv(ratio);
+  var rows=[];
+  if(mv!=null) rows.push(['持仓市值', money(mv)+' 元'+(totalMV>0?('　占 '+fx(mv/totalMV*100,1)+'%'):'')]);
+  else rows.push(['持仓','未填份额']);
+  if(ratio!=null){
+    var mon=ratio*12;
+    rows.push(['累计投入量','约 '+fx(mon,1)+' 个月的定投额']);
+  }
+  return { lb:g.lb, tone:g.tone, dot:g.dot, lv:g.lv, kind:'hold', rows:rows,
+           mv:mv, totalMV:totalMV, ratio:ratio, retPct:(d&&f.cost>0&&mv!=null)?((mv-f.cost)/f.cost*100):null };
+}
+
+function assessAll(f,d,s){
+  var A={ longVal:assessLongVal(f,d), shortPos:assessShortPos(f,d,s),
+          quality:assessQuality(f,d), hold:assessHold(f,d) };
+  /* 结论所需的金额与倍数直接取自 calcSignal（单一真源），不在这里重算 */
+  A.s=s;
+  return A;
+}
+
+/* ── 估值温度：直接用主口径 PE 分位当温度（0°最便宜 / 100°最贵），
+      不做二次加工 —— 页面上标的数字与温度对得上，才谈得上可核验。 ── */
+function tempOf(v){
+  if(!v) return null;
+  var main=valMain(v), p=main?main.p.pct:null;
+  if(p==null||!isFinite(p)) return null;
+  return { deg:Math.round(p), pct:p, win:main.win, pe:v.pe,
+           pbPct:v.pbPct==null?null:v.pbPct, dy:v.dy,
+           gap:(v.pbPct==null?null:Math.abs(p-v.pbPct)) };
+}
+
+/* ── 四张卡 ── */
+function quadCard(no, title, hint, A){
+  var h='<div class="qc" style="border-left-color:'+A.dot+'">';
+  h+='<div class="hd"><span class="no">'+no+'</span>'+title
+    +(hint?'<span style="margin-left:auto;color:var(--faint);font-weight:700">'+hint+'</span>':'')+'</div>';
+  h+='<div class="lb" style="color:'+A.tone+'"><span class="dot" style="background:'+A.dot+'"></span>'+esc(A.lb)+'</div>';
+  A.rows.forEach(function(r){
+    h+='<div class="r">'+esc(r[0])+'　<b>'+r[1]+'</b></div>';
+  });
+  h+='</div>';
+  return h;
+}
+function quadCards(A){
+  var h='<div class="quad">';
+  h+=quadCard('①','长期贵不贵','', A.longVal);
+  h+=quadCard('②','短期位置','', A.shortPos);
+  h+=quadCard('③','资产质量','', A.quality);
+  h+=quadCard('④','我的持仓','', A.hold);
+  h+='</div>';
+  return h;
+}
+
+/** 章节标题：统一编号与副标题，避免每处各写一遍 */
+function sect(no, name, tag, hint){
+  /* 有编号的是一级章节，没编号的是它下面的子块（如「价格位置」里的布林带），
+     用更轻的样式区分层级，避免看起来是并列关系。 */
+  return '<div class="'+(no?'sect':'sectsub')+'">'+(no?(no+' '):'')+name
+    +(tag?'<span class="tag">'+tag+'</span>':'')
+    +(hint?'<span class="hint">'+hint+'</span>':'')+'</div>';
+}
+
+/* ── 结论卡：把四张卡与金额串成一条能读懂的推理 ── */
+function verdictCard(f,d,s,A){
+  var LV=A.longVal, SP=A.shortPos, Q=A.quality, HD=A.hold;
+  var mult=n(s.detail.mult), base=n(s.detail.baseMult, mult), cap=n(s.detail.cap,2);
+  var amt=n(s.detail.amount), bs=n(s.detail.amountBase), ex=n(s.detail.amountExtra), wkAmt=n(s.detail.week);
+  var isStop=(s.level==='stop');
+  var k = isStop ? 'k-stop' : (mult>=1 ? 'k-go' : (mult>0 ? 'k-mid' : 'k-none'));
+  var title = isStop ? '考虑部分止盈'
+    : (mult>=2 ? '可以加倍加仓' : (mult>=1 ? '正常定投' : (mult>0 ? '小额加仓' : '暂不加仓')));
+
+  var h='<div class="vcard '+k+'">';
+  h+='<div class="t2">本周见鸡行事　'+title+'</div>';
+  h+='<div class="m2">'+(amt>0?('加 '+money(amt).replace(/\.00$/,'')+' 元'):'本周不投入')+'</div>';
+  h+='<div class="s2">'+(mult>0
+      ? ('相当于周投基准的 '+fx(mult,2)+' 倍'+(ex>0?'（另含年线补仓）':''))
+      : '条件转好再动手，不为了投而投')+'</div>';
+
+  /* 原因：四张卡各出一条，谁在起约束作用一眼能看出 */
+  var rs=[];
+  if(LV.lv!=null){
+    if(LV.lv>=4) rs.push(['估值','长期估值<b>'+LV.lb+'</b>（PE '+fx(LV.v.pe,2)+'，'+(LV.win||'')+'分位 '+fx(LV.pct,1)
+      +'%），<b>不适合大额增加</b>']);
+    else if(LV.lv<=2) rs.push(['估值','长期估值<b>'+LV.lb+'</b>（'+(LV.win||'')+'分位 '+fx(LV.pct,1)+'%），有加大投入的空间']);
+    else rs.push(['估值','长期估值<b>温和</b>（'+(LV.win||'')+'分位 '+fx(LV.pct,1)+'%），维持原计划即可']);
+  }else if(LV.kind==='px'){
+    rs.push(['估值','商品没有市盈率、股息率，改用价格尺子：当前价高于史上 '+fx(LV.pct,0)
+      +'% 的时间，<b>'+LV.lb+'</b>。这条<b>不参与金额约束</b> —— 长期上涨的资产用位置衡量会一直偏高，'
+      +'它只帮你判断「现在是不是追高」']);
+  }else if(LV.kind==='na'){
+    rs.push(['估值','这类资产没有市盈率／股息率，<b>只能用价格位置判断</b>']);
+  }
+  if(SP.lv!=null){
+    if(SP.lv<=2) rs.push(['位置','短期<b>'+SP.lb+'</b>'+(SP.p20!=null?('（20 日分位 '+fx(SP.p20,0)+'%）'):'')
+      +(SP.boll&&SP.nav&&SP.boll.lower>0&&(SP.nav/SP.boll.lower-1)*100<=1.5?'，且已贴近布林下轨':'')+'，是相对好的买入窗口']);
+    else if(SP.lv===3) rs.push(['位置','短期位置<b>正常</b>，按原计划投即可']);
+    else rs.push(['位置','短期<b>'+SP.lb+'</b>，此刻买入性价比一般，不必抢']);
+  }
+  if(!Q.na){
+    rs.push(['质量','资产质量<b>'+Q.lb+'</b>：'+Q.why]);
+  }
+  if(HD.lv!=null){
+    if(HD.lv<=2) rs.push(['持仓','当前持仓<b>'+HD.lb+'</b>'
+      +(HD.mv!=null?('（'+money(HD.mv)+' 元'+(HD.ratio!=null?(('，约 '+fx(HD.ratio*12,1)+' 个月定投量')):'')+'）'):'')
+      +'，敞口小'+(mult>0?'，<b>允许小额定投</b>':'；这次卡住的是位置，不是仓位')]);
+    else if(HD.lv>=4) rs.push(['持仓','持仓已<b>'+HD.lb+'</b>，不再额外加码']);
+    else rs.push(['持仓','持仓比例<b>正常</b>']);
+  }
+  if(s.level==='stop'&&s.reason&&s.reason.length){
+    rs=[['止盈','持有收益已达你设的 '+f.tp+'% 止盈线，<b>止盈优先于加仓</b>']].concat(s.reason.map(function(r){ return ['',r.t]; }));
+  }
+  if(rs.length){
+    h+='<div class="why"><div class="wt">为什么是这个结论</div>';
+    rs.forEach(function(r){
+      h+='<div class="wi"><span class="b">'+(r[0]||'·')+'</span><span>'+r[1]+'</span></div>';
     });
     h+='</div>';
-    h+='<div class="sub2">历史分位（该窗口内价格所处位置）</div><div class="kvs">';
-    [20,60,120,250].forEach(function(w){
-      var p=m.pos['p'+w];
-      h+='<div class="kv"><span class="k">'+w+' 日分位</span><span class="v">'+(p==null?'--':p.toFixed(0)+'%')+'</span></div>';
-    });
-    h+='</div>';
-    h+='<div class="sub2">区间收益</div><div class="kvs">';
-    [['近 5 日','r5'],['近 10 日','r10'],['近 20 日','r20'],['近 60 日','r60'],['近 120 日','r120'],['近 250 日','r250'],['近 1 年','r1y']].forEach(function(x){
+  }
+  /* 算式摊开：倍数怎么来的，避免「凭空变出一个数」 */
+  if(!isStop && wkAmt>0){
+    h+='<div class="calc">短期位置给 <b>'+fx(base,2)+'</b> 倍'
+      +(cap<2?('，长期估值把上限压到 <b>'+fx(cap,2)+'</b> 倍'):'，长期估值未设限')
+      +' → 取小得 <b>'+fx(mult,2)+'</b> 倍<br>'
+      +'周投基准 '+money(wkAmt)+' 元 × '+fx(mult,2)+' 倍 = <b>'+money(bs)+'</b> 元'
+      +(ex>0?('　＋ 年线补仓 <b>'+money(ex)+'</b> 元'):'')
+      +'　＝ 合计 <b>'+money(amt)+'</b> 元</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+/* ── ② 短期位置明细：布林带 ── */
+function secBoll(f,d,s,no){
+  var m=d&&d.metrics?d.metrics:null, navNow=d?n(d.nav):null;
+  var h=sect(no,'布林带','20 日 · 2 倍标准差','这周买划不划算');
+  if(!(m&&m.boll)) return h+'<div class="empty">净值样本不足 20 个交易日，算不出布林带</div>';
+  var b=m.boll, pinPct=Math.max(2,Math.min(98,s.detail.pctB==null?50:s.detail.pctB));
+  h+='<div class="boll-box"><div class="boll-head"><span>价格在通道里的位置（近 20 日）</span>'
+    +'<span class="num">'+fx(b.lower,4)+' ｜ '+fx(b.mid,4)+' ｜ '+fx(b.upper,4)+'</span></div>'
+    +'<div class="boll-track"><div class="boll-band"></div>'
+    +'<div class="boll-mid" style="left:50%"></div>'
+    +'<div class="boll-pin" style="left:'+pinPct+'%"></div>'
+    +'<div class="boll-pin-lb" style="left:'+pinPct+'%">'+fx(navNow,4)+'</div>'
+    +'</div><div class="boll-axis"><span>便宜（下轨）</span><span>中轨</span><span>偏贵（上轨）</span></div></div>';
+  if(navNow){
+    var gap=(navNow/b.lower-1)*100, tip;
+    if(gap<=0) tip='已跌破布林下轨，属于超卖区，是较好的分批买入区间。';
+    else if(gap<=1.5) tip='距下轨仅 '+gap.toFixed(2)+'%，已经很接近超卖区，可以开始小额分批。';
+    else if(gap<=5) tip='距下轨还有 '+gap.toFixed(2)+'%，未到理想买点，可等到跌近下轨再动手。';
+    else tip='距下轨还有 '+gap.toFixed(2)+'%，位置偏高，建议耐心等待回落。';
+    h+='<div class="buyline">'
+      +'<div class="r"><span class="k">当前净值</span><span class="v num">'+fx(navNow,4)+'</span></div>'
+      +'<div class="r"><span class="k">布林下轨（超卖触发）</span><span class="v num" style="color:#0a7d45">'+fx(b.lower,4)+'</span></div>'
+      +'<div class="r"><span class="k">布林中轨（20 日均线）</span><span class="v num">'+fx(b.mid,4)+'</span></div>'
+      +'<div class="r"><span class="k">布林上轨（偏高）</span><span class="v num" style="color:#c22">'+fx(b.upper,4)+'</span></div>'
+      +'<div class="r"><span class="k">通道宽度（波动收敛/扩张）</span><span class="v num">'+fx(b.width,2)+'%</span></div>'
+      +'<div class="hint">'+tip+'</div></div>';
+  }
+  return h;
+}
+
+/* ── 其他技术指标：均线偏离 / 区间分位 / 区间收益 ── */
+function secTech(f,d,s,no,title){
+  var m=d&&d.metrics?d.metrics:null;
+  var h=sect(no, title||'其他技术指标','','全部按分红再投复权净值计算');
+  if(!m) return h+'<div class="empty">数据未就绪</div>';
+  h+='<div class="pn">';
+  h+='<div class="sub2">均线偏离（负数=在均线下方）</div><div class="kvs">';
+  [5,10,20,60,120,250].forEach(function(w){
+    var x=m.ma[w];
+    h+='<div class="kv"><span class="k">距 '+w+' 日线</span><span class="v '+chgCls(x?x.dev:null)+'">'+(x?pct(x.dev):'--')+'</span></div>';
+  });
+  h+='</div>';
+  h+='<div class="sub2">历史分位（该窗口内价格所处位置）</div><div class="kvs">';
+  [20,60,120,250].forEach(function(w){
+    var p=m.pos['p'+w];
+    h+='<div class="kv"><span class="k">'+w+' 日分位</span><span class="v">'+(p==null?'--':p.toFixed(0)+'%')+'</span></div>';
+  });
+  h+='</div>';
+  h+='<div class="sub2">区间收益</div><div class="kvs">';
+  [['近 5 日','r5'],['近 10 日','r10'],['近 20 日','r20'],['近 60 日','r60'],['近 120 日','r120'],['近 250 日','r250'],['近 1 年','r1y']].forEach(function(x){
+    var v=m.rets[x[1]];
+    h+='<div class="kv"><span class="k">'+x[0]+'</span><span class="v '+chgCls(v)+'">'+(v==null?'--':pct(v))+'</span></div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+
+/* ── ⑤ 风险评估（回撤 / 波动 / 夏普 / Calmar / 信息比率） ── */
+function secRisk(f,d,s,no,title){
+  var rk=riskOfFund(d);
+  var h=sect(no, title||'风险评估', rk?('近 '+rk.win+' 个交易日'):'样本不足',
+    rk?(dstr(rk.fromDate)+' ~ '+dstr(rk.toDate)):'');
+  if(!rk){
+    return h+'<div class="empty">'+(d.histAll
+      ?'净值样本不足，算不出风险指标'
+      :'完整净值序列更新中…数据到位后自动计算')+'</div>';
+  }
+  h+=rvRow('夏普比率','同样的风险，谁赚得多？',
+    rk.sharpe==null?'--':rk.sharpe.toFixed(2),'',rvGrade('sharpe',rk.sharpe),
+    '年化收益 '+(rk.annArith>=0?'+':'')+rk.annArith.toFixed(1)+'% 减无风险利率 '+fx(rk.rf,1)+'%，除以年化波动率 '+rk.vol.toFixed(1)+'%。'
+    +'大于 1 算好，小于 0 说明承担了波动却没换来超过存款的收益。');
+  h+=rvRow('最大回撤','最坏情况，你能亏多少？',
+    rk.mdd==null?'--':rk.mdd.toFixed(1),'%',rvGrade('mdd',rk.mdd),
+    '这段时间里从最高点跌到最低点的幅度。历史上真跌过这么深，下次同样可能。');
+  h+=rvRow('年化波动率','上蹿下跳有多猛？',
+    rk.vol.toFixed(1),'%',rvGrade('vol',rk.vol),
+    '日涨跌的标准差折算成年化。数字越大，短期净值晃得越凶，也越容易拿不住。');
+  h+=rvRow('Calmar 比率','收益和回撤，哪个更划算？',
+    rk.calmar==null?'--':rk.calmar.toFixed(2),'',rvGrade('calmar',rk.calmar),
+    '年化收益 '+rk.annGeo.toFixed(1)+'% ÷ 最大回撤 '+rk.mdd.toFixed(1)+'%。衡量「为拿到这些收益，忍受了多大的坑」。');
+  if(rk.ir!=null){
+    h+=rvRow('信息比率','基金经理有没有跑赢指数？', rk.ir.toFixed(2),'',rvGrade('ir',rk.ir),
+      '相对'+BENCH_NAME+'的年化超额 '+(rk.exAnn>=0?'+':'')+rk.exAnn.toFixed(1)+'% ÷ 跟踪误差 '+rk.te.toFixed(1)
+      +'%，按日期对齐 '+rk.aligned+' 天。正值代表跑赢指数，负值说明跑输、且承担了额外的偏离风险。');
+  }else{
+    h+=rvRow('信息比率','基金经理有没有跑赢指数？','--','',rvGrade('ir',null),
+      BENCH_INFO?('基准数据不足或与基金净值日对不齐，暂不计算（需至少 40 天对齐）')
+                :('基准（'+BENCH_NAME+'）未取到，刷新后重试'));
+  }
+  h+='<div class="disc">风险指标口径：窗口取近 '+RISK_WIN+' 个交易日（不足则用全部可用样本），'
+    +'年化系数 250，无风险利率 '+fx(rk.rf,1)+'%/年。'
+    +'最大回撤与 Calmar 基于复权净值；信息比率相对 '+BENCH_NAME+'（'+BENCH_SYM+'）。'
+    +'这些是<b>同一只基金自身的历史统计</b>，不代表未来。</div>';
+  return h;
+}
+
+/* ── 价格（商品类资产的第一入口） ── */
+function secPrice(f,d,s,no){
+  var h=sect(no,'价格','','商品只看价格本身');
+  var m=d&&d.metrics?d.metrics:null, nav=d?n(d.nav):null;
+  if(!nav) return h+'<div class="empty">净值未取到</div>';
+  h+='<div class="vbox"><div class="vtop"><span class="big">'+fx(nav,4)+'</span>'
+    +'<span class="u">复权净值 · '+esc(d.navDate||'--')+'</span></div>';
+  if(d.live&&d.live.price){
+    h+='<div class="live" style="margin-top:8px"><span class="tag">'+(d.live.today?'今日盘中参考':'场内最新')+'</span>'
+      +'<span>'+esc(d.live.sym)+' '+d.live.price.toFixed(3)+'</span>'
+      +'<span class="'+chgCls(d.live.chg)+'" style="font-weight:800">'+pct(d.live.chg)+'</span></div>';
+  }
+  if(m&&m.rets){
+    h+='<div class="kvs" style="margin-top:10px">';
+    [['近 5 日','r5'],['近 20 日','r20'],['近 60 日','r60'],['近 250 日','r250'],['近 1 年','r1y']].forEach(function(x){
       var v=m.rets[x[1]];
       h+='<div class="kv"><span class="k">'+x[0]+'</span><span class="v '+chgCls(v)+'">'+(v==null?'--':pct(v))+'</span></div>';
     });
     h+='</div>';
-    h+='</div>';
-  }else{
-    h+='<div class="empty">数据未就绪</div>';
   }
+  h+='<div class="disc" style="margin-top:9px">黄金这类商品资产不产生盈利、也不分红，'
+    +'所以在它身上算 PE、PB、股息率都没有意义。<b>它的「贵」只能用价格本身说话</b>：'
+    +'偏离长期均线多远、涨了多少、回撤多深。这不是数据缺失，是资产属性。</div>';
+  h+='</div>';
+  return h;
+}
 
-  /* ── ⑥ 风险评估 ── */
+/** 与业绩基准的日收益相关系数：判断它能不能替组合分散风险 */
+function corrWithBench(d){
+  var v=d&&d.histAll, dt=d&&d.datesAll, b=BENCH_INFO;
+  if(!v||!dt||!b||!b.retTs) return null;
+  var xs=[], ys=[], i, r, a;
+  for(i=1;i<v.length;i++){
+    r=b.retTs[dt[i]];
+    if(r==null||!isFinite(r)) continue;
+    a=v[i]/v[i-1]-1;
+    if(!isFinite(a)) continue;
+    xs.push(a); ys.push(r);
+  }
+  var cnt=xs.length;
+  if(cnt<60) return null;
+  var mx=0,my=0,k;
+  for(k=0;k<cnt;k++){ mx+=xs[k]; my+=ys[k]; }
+  mx/=cnt; my/=cnt;
+  var sxy=0,sxx=0,syy=0,dx,dy;
+  for(k=0;k<cnt;k++){ dx=xs[k]-mx; dy=ys[k]-my; sxy+=dx*dy; sxx+=dx*dx; syy+=dy*dy; }
+  if(sxx<=0||syy<=0) return null;
+  return { r:sxy/Math.sqrt(sxx*syy), cnt:cnt };
+}
+
+/* ── 宏观环境 ──
+   诚实的边界声明：真正驱动金价的宏观变量（美国实际利率、美元指数、央行购金）
+   目前没有可直连的公开数据源，所以这里一个数都不猜。
+   给的是「可得且可核查」的三项：与 A 股的联动性、长期年化、年化波动。 */
+function secMacro(f,d,s,no){
+  var h=sect(no,'宏观环境','','相关性与组合角色（可核查）');
   var rk=riskOfFund(d);
-  h+='<div class="sect">⑥ 风险评估'
-    +'<span class="tag">'+(rk?('近 '+rk.win+' 个交易日'):'样本不足')+'</span>'
-    /* fromDate / toDate 是毫秒时间戳，必须过 dstr() 格式化，否则会原样吐出一串数字 */
-    +'<span class="hint">'+(rk?(dstr(rk.fromDate)+' ~ '+dstr(rk.toDate)):'')+'</span></div>';
-  if(!rk){
-    h+='<div class="empty">'+(d.histAll
-      ?'净值样本不足，算不出风险指标'
-      :'完整净值序列更新中…数据到位后自动计算')+'</div>';
+  var c=corrWithBench(d);
+  var v=d&&d.histAll, ann=null;
+  if(v&&v.length>250) ann=(Math.pow(v[v.length-1]/v[0], 250/(v.length-1))-1)*100;
+  h+='<div class="vbox">';
+  if(c){
+    var tone = c.r<0.2?'#0f9d63':(c.r<0.5?'#8a8f45':'#dd8a2b');
+    var txt = c.r<0.2?'与 A 股基本不相关，是真正的分散器'
+            : c.r<0.5?'与 A 股弱相关，能起到一定对冲'
+            : '与 A 股同向性较高，分散作用有限';
+    h+='<div class="kvrow"><span class="k">与'+BENCH_NAME+'日收益相关性</span>'
+      +'<span class="v" style="color:'+tone+'">'+fx(c.r,2)+'</span></div>'
+      +'<div class="disc" style="margin-top:6px">'+txt+'（按 '+c.cnt+' 个可比交易日逐日对齐计算，'
+      +'1 = 完全同涨同跌，0 = 毫无关系）。这就是「避险资产」在组合里的实际作用。</div>';
   }else{
-    h+=rvRow('夏普比率','同样的风险，谁赚得多？',
-      rk.sharpe==null?'--':rk.sharpe.toFixed(2),'',rvGrade('sharpe',rk.sharpe),
-      '年化收益 '+(rk.annArith>=0?'+':'')+rk.annArith.toFixed(1)+'% 减无风险利率 '+fx(rk.rf,1)+'%，除以年化波动率 '+rk.vol.toFixed(1)+'%。'
-      +'大于 1 算好，小于 0 说明承担了波动却没换来超过存款的收益。');
-    h+=rvRow('最大回撤','最坏情况，你能亏多少？',
-      rk.mdd==null?'--':rk.mdd.toFixed(1),'%',rvGrade('mdd',rk.mdd),
-      '这段时间里从最高点跌到最低点的幅度。历史上真跌过这么深，下次同样可能。');
-    h+=rvRow('年化波动率','上蹿下跳有多猛？',
-      rk.vol.toFixed(1),'%',rvGrade('vol',rk.vol),
-      '日涨跌的标准差折算成年化。数字越大，短期净值晃得越凶，也越容易拿不住。');
-    h+=rvRow('Calmar 比率','收益和回撤，哪个更划算？',
-      rk.calmar==null?'--':rk.calmar.toFixed(2),'',rvGrade('calmar',rk.calmar),
-      '年化收益 '+rk.annGeo.toFixed(1)+'% ÷ 最大回撤 '+rk.mdd.toFixed(1)+'%。衡量「为拿到这些收益，忍受了多大的坑」。');
-    if(rk.ir!=null){
-      h+=rvRow('信息比率','基金经理有没有跑赢指数？',
-        rk.ir.toFixed(2),'',rvGrade('ir',rk.ir),
-        '相对'+BENCH_NAME+'的年化超额 '+(rk.exAnn>=0?'+':'')+rk.exAnn.toFixed(1)+'% ÷ 跟踪误差 '+rk.te.toFixed(1)
-        +'%，按日期对齐 '+rk.aligned+' 天。正值代表跑赢指数，负值说明跑输、且承担了额外的偏离风险。');
-    }else{
-      h+=rvRow('信息比率','基金经理有没有跑赢指数？','--','',rvGrade('ir',null),
-        BENCH_INFO?('基准数据不足或与基金净值日对不齐，暂不计算（需至少 40 天对齐）')
-                  :('基准（'+BENCH_NAME+'）未取到，刷新后重试'));
-    }
-    h+='<div class="disc">风险指标口径：窗口取近 '+RISK_WIN+' 个交易日（不足则用全部可用样本），'
-      +'年化系数 250，无风险利率 '+fx(rk.rf,1)+'%/年。'
-      +'最大回撤与 Calmar 基于复权净值；信息比率相对 '+BENCH_NAME+'（'+BENCH_SYM+'）。'
-      +'这些是<b>同一只基金自身的历史统计</b>，不代表未来。</div>';
+    h+='<div class="disc">与'+BENCH_NAME+'的相关性暂算不出（基准未取到或对齐天数不足）。</div>';
   }
+  h+='<div class="vgrid" style="margin-top:8px">';
+  if(ann!=null) h+='<div class="vg"><div class="k">全区间年化</div>'
+    +'<div class="v '+(ann>=0?'up':'dn')+'">'+(ann>=0?'+':'')+fx(ann,2)+'%</div>'
+    +'<div class="s">'+v.length+' 个交易日</div></div>';
+  if(rk) h+='<div class="vg"><div class="k">年化波动率</div>'
+    +'<div class="v">'+fx(rk.vol,1)+'%</div><div class="s">近 '+rk.win+' 日窗口</div></div>';
+  h+='</div>';
+  h+='<div class="disc" style="margin-top:9px;background:#fff8e8;border-radius:8px;padding:8px 10px">'
+    +'<b>这里没有放宏观数字，是刻意的。</b>美国实际利率、美元指数、央行购金量这些真正驱动金价的变量，'
+    +'目前没有可直连的公开接口，我不会凭印象写一个数上去。'
+    +'上面几项都是从本页已有的真实数据算出来的，可以自己复算。</div>';
+  h+='</div>';
+  return h;
+}
 
-  /* ── ⑦ 基金经理与规模 ── */
-  h+='<div class="sect">⑦ 基金经理与规模</div>';
+/* ── 我的持仓（钱的部分） ── */
+function secHold(f,d,s,no){
+  var A=assessHold(f,d);
+  var h=sect(no,'我的持仓','','仓位决定你能扛多少');
+  h+='<div class="pn">';
+  var sh=n(f.shares);
+  if(sh>0){
+    h+='<div class="kvs">'
+      +'<div class="kv"><span class="k">持有份额</span><span class="v num">'+fx(sh,2)+' 份</span></div>'
+      +'<div class="kv"><span class="k">投入成本</span><span class="v num">'+money(n(f.cost))+' 元</span></div>'
+      +'<div class="kv"><span class="k">当前市值</span><span class="v num">'+(A.mv==null?'--':money(A.mv)+' 元')+'</span></div>'
+      +'<div class="kv"><span class="k">持有收益</span><span class="v '+chgCls(A.retPct)+'">'
+      +(A.retPct==null?'--':pct(A.retPct))+'</span></div></div>';
+    h+='<div class="kvrow" style="margin-top:6px"><span class="k">占三只基金总市值</span><span class="v">'
+      +(A.totalMV>0&&A.mv!=null?fx(A.mv/A.totalMV*100,1)+'%':'--')+'</span></div>';
+    if(A.ratio!=null){
+      h+='<div class="kvrow"><span class="k">持仓 ÷ 一年计划投入</span><span class="v">'
+        +fx(A.ratio,2)+' 倍（约 '+fx(A.ratio*12,1)+' 个月的量）</span></div>'
+      +'<div class="disc" style="margin-top:6px">持仓轻重不看占组合的比例，看「已经积累了几个月的定投量」'
+      +' —— 现在三只加起来规模都小，占组合高只说明别的买得少，不代表这只买多了。</div>';
+    }
+  }else{
+    h+='<div class="tip">还没填持有份额（在设置页填「份额 × 最新净值」才是真实市值）。'
+      +'没有持仓时，仓位不会成为加仓的限制项。</div>';
+  }
+  h+='</div>';
+  h+=maPlanBox(d,s);
+  return h;
+}
+
+/* ── 基金规模与资产配置（含基金经理） ── */
+function secScale(f,d,s,no){
+  var h=sect(no,'基金规模与资产配置','','钱多不多、装了什么');
   var mi=mgrInfo(f,d);
   if(d.mgr&&d.mgr.length){
     var mg=d.mgr[0];
@@ -2271,8 +2804,6 @@ function renderFund(){
   }else{
     h+='<div class="empty">未取到基金经理信息（'+((d.proxy)?'代理取数不含该字段':'数据源未返回')+'）</div>';
   }
-
-  /* 规模与资产配置 */
   if(d.scale||d.alloc){
     h+='<div class="pn"><h2>📊 规模与资产配置</h2>';
     if(d.scale&&d.scale.vals.length){
@@ -2290,6 +2821,96 @@ function renderFund(){
     }
     h+='</div>';
   }
+  return h;
+}
+
+/** 价格位置 / 趋势 / 市场位置：三条均线 + 布林带 + 技术指标，三只基金共用 */
+function secPos(f,d,s,no,label){
+  var sub = label==='趋势' ? '长期趋势有没有掉头' : '定长期值不值得花钱';
+  var h=sect(no, label||'价格位置', '250 日年线 · 120 日半年线', sub);
+  var ch=maChart(d,s);
+  if(ch) h+=ch;
+  else h+='<div class="empty">'+(d.histAll
+    ?('净值样本不足 '+(MA_WIN+30)+' 个交易日，暂画不出长线位置图')
+    :('完整净值序列更新中…数据到位后自动显示'))+'</div>';
+  h+=secBoll(f,d,s,'');
+  h+=secTech(f,d,s,'',label==='趋势'?'趋势细节':'其他技术指标');
+  return h;
+}
+
+/* ── 章节分发：内容按主题取，顺序由 flowOf() 决定 ── */
+function sectionOf(kind, no, f, d, s, A){
+  switch(kind){
+    case '估值':     return secVal(f,d,s,no);
+    case '股息':     return secDiv(f,d,s,no);
+    case '盈利':     return secEarn(f,d,s,no);
+    case '价格':     return secPrice(f,d,s,no);
+    case '趋势':
+    case '市场位置':
+    case '价格位置': return secPos(f,d,s,no,kind);
+    case '回撤':
+    case '风险':     return secRisk(f,d,s,no, kind==='回撤'?'回撤与风险':'风险评估');
+    case '宏观环境': return secMacro(f,d,s,no);
+    case '我的持仓': return secHold(f,d,s,no);
+    case '规模与配置': return secScale(f,d,s,no);
+    default: return '';
+  }
+}
+
+function renderFund(){
+  var el=document.getElementById('view-fund');
+  if(!el) return;
+  if(!fundPage){ el.innerHTML=''; return; }
+  var f=fundByCode(fundPage);
+  if(!f){ el.innerHTML='<div class="empty">基金不存在</div>'; return; }
+  var d=dataMap[f.code];
+  var s=calcSignal(f);
+  var m=d&&d.metrics?d.metrics:null;
+  var navNow=(d&&d.nav)?n(d.nav):null;
+
+  var h='';
+  /* 返回栏 */
+  h+='<button class="back" onclick="closeFund()">'
+    +'<span class="bic">‹</span><span class="btx">返回仪表盘总览</span>'
+    +'<span class="bsub">当前：'+esc(shortName(f.name))+'</span></button>';
+
+  /* 头卡 */
+  h+='<div class="fhead"><div class="t">'+esc(f.name)+'</div>'
+    +'<div class="c"><span>'+f.code+'</span>'
+    +(f.cat?'<span class="pill">'+esc(f.cat)+'</span>':'')
+    +(f.etf?'<span class="pill">场内 '+f.etf+'</span>':'')
+    +(f.tp>0?'<span class="pill">止盈 '+f.tp+'%</span>':'<span class="pill">无止盈</span>')
+    +'</div>'
+    +'<div class="navrow"><span class="big num">'+(navNow?navNow.toFixed(4):'--')+'</span>'
+    +'<span class="ch num '+chgCls(d?n(d.navChg):null)+'">'+((d&&d.navChg!=null)?pct(d.navChg):'--')+'</span>'
+    +'<span class="dt">净值日期 '+(d&&d.navDate?d.navDate:'--')
+    +(d&&d.live?('<br>场内 '+esc(d.live.sym)+' '+d.live.price.toFixed(3)+' <b class="'+chgCls(d.live.chg)+'">'+pct(d.live.chg)+'</b>'):'')
+    +'</span></div></div>';
+
+  if(!d||!d.ok){
+    h+='<div class="empty">该基金数据未取到'
+      +((d&&d.errors&&d.errors.length)?('<br>'+esc(d.errors.join('；'))):'')
+      +'<br>请点右上角「刷新」重试</div>';
+    el.innerHTML=h; return;
+  }
+
+  /* ── 判断链：四张卡 → 一条结论 → 按主线铺开细节 ──
+     四张卡回答「长期贵不贵 / 短期位置在哪 / 资产质量如何 / 我手里有多重」，
+     结论卡把它们收成一个金额；下面的章节就是这四个结论的证据。
+     顺序按基金类型走：红利类看分红、宽基看盈利、商品只看价格。 */
+  var A=assessAll(f,d,s);
+  h+=quadCards(A);
+  h+=verdictCard(f,d,s,A);
+
+  var flow=flowOf(f), NO=["①","②","③","④","⑤","⑥","⑦","⑧"];
+  flow.forEach(function(kind, i){
+    h+=sectionOf(kind, NO[i]||"·", f, d, s, A);
+  });
+
+  h+='<div class="disc" style="margin-top:10px">本页章节顺序按这只基金的类型走：'
+    +esc(flow.join(" → "))+'。不同类型看的东西不一样 —— '
+    +'红利类先看分红和估值，宽基先看盈利能不能撑住价格，商品则只能看价格本身。'
+    +'换一只基金，这一页的重点会自动切换。</div>';
 
   /* 数据来源与免责 */
   h+='<div class="disc">净值数据：天天基金（'+d.bars+' 个交易日'
